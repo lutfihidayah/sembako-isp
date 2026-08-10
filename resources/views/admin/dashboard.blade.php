@@ -4,17 +4,6 @@
 
 @section('content')
 
-<!-- TOP BAR -->
-<div class="admin-topbar">
-    <div>
-        <div class="page-title">Dashboard Overview</div>
-        <div class="page-subtitle">Selamat datang, {{ Auth::guard('admin')->user()->name }}. Berikut ringkasan performa dan aktivitas toko sembako Anda.</div>
-    </div>
-    <div style="font-size: 0.8rem; color: #64748b; display: flex; align-items: center; gap: 8px; background: #f8fafc; padding: 6px 12px; border-radius: var(--radius-full); border: 1px solid #e2e8f0;">
-        <x-icon name="clock" size="14" />
-        <span style="font-weight: 600;">{{ now()->format('d M Y, H:i') }} WIB</span>
-    </div>
-</div>
 
 <!-- ============================================================
      ROW 1: SAAS OVERVIEW (MAIN CHART + DONUT BREAKDOWN)
