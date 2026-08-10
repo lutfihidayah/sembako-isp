@@ -1396,15 +1396,16 @@ textarea.form-control { resize: vertical; min-height: 105px; }
 }
 
 /* ============================================================
-   ADMIN SIDEBAR LAYOUT
+   ADMIN SIDEBAR & COMPACT 80% SCALE LAYOUT
    ============================================================ */
 .admin-layout {
     display: flex;
     min-height: 100vh;
+    font-size: 13.5px;
 }
 
 .admin-sidebar {
-    width: 260px;
+    width: 220px;
     background: linear-gradient(180deg, #043d1c 0%, #064e24 60%, #0a5826 100%);
     min-height: 100vh;
     position: sticky;
@@ -1417,20 +1418,21 @@ textarea.form-control { resize: vertical; min-height: 105px; }
 }
 
 .sidebar-logo {
-    padding: var(--space-lg);
+    padding: 14px 16px;
     border-bottom: 1px solid rgba(255,255,255,.08);
     display: flex;
     align-items: center;
-    gap: var(--space-sm);
+    gap: 8px;
     color: #fff;
     font-weight: 800;
-    font-size: 1.15rem;
+    font-size: 1.05rem;
 }
 
 .sidebar-logo .logo-icon {
-    width: 36px; height: 36px;
+    width: 32px;
+    height: 32px;
     background: linear-gradient(135deg, var(--primary-400), var(--primary-600));
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-sm);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1439,38 +1441,32 @@ textarea.form-control { resize: vertical; min-height: 105px; }
 
 .sidebar-nav {
     flex: 1;
-    padding: var(--space-md) var(--space-sm);
+    padding: 12px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
     overflow-y: auto;
-}
-
-.sidebar-section-label {
-    font-size: 0.7rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: rgba(255,255,255,.35);
-    padding: var(--space-sm) var(--space-sm);
-    margin-top: var(--space-sm);
 }
 
 .sidebar-item {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 11px var(--space-sm);
+    gap: 10px;
+    padding: 9px 12px;
     border-radius: var(--radius-md);
-    color: rgba(255,255,255,.7);
-    font-size: 0.9rem;
+    color: rgba(255,255,255,.8);
+    text-decoration: none;
+    font-size: 0.835rem;
     font-weight: 500;
     transition: all var(--transition);
-    margin-bottom: 2px;
 }
-.sidebar-item:hover, .sidebar-item.active {
-    background: rgba(255,255,255,.09);
+
+.sidebar-item:hover,
+.sidebar-item.active {
+    background: rgba(255,255,255,.15);
     color: #fff;
+    font-weight: 600;
 }
-.sidebar-item.active { background: var(--primary-700); color: #fff; }
-.sidebar-item .icon { display: flex; align-items: center; justify-content: center; }
 
 .sidebar-footer {
     padding: var(--space-md);
@@ -1481,29 +1477,29 @@ textarea.form-control { resize: vertical; min-height: 105px; }
     flex: 1;
     min-width: 0;
     background: var(--gray-50);
-    padding: var(--space-xl);
+    padding: 16px 20px;
 }
 
 .admin-topbar {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: var(--space-xl);
-    padding-bottom: var(--space-lg);
+    margin-bottom: 14px;
+    padding-bottom: 12px;
     border-bottom: 1px solid var(--gray-200);
     flex-wrap: wrap;
-    gap: var(--space-md);
+    gap: 10px;
 }
 
 .page-title {
-    font-size: 1.6rem;
+    font-size: 1.3rem;
     font-weight: 800;
     color: var(--gray-900);
 }
 .page-subtitle {
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     color: var(--gray-500);
-    margin-top: 2px;
+    margin-top: 1px;
 }
 
 .admin-mobile-header {

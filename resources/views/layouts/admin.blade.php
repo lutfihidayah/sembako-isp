@@ -40,39 +40,32 @@
         </div>
 
         <nav class="sidebar-nav">
-            <div class="sidebar-section-label">Menu Utama</div>
             <a href="{{ route('admin.dashboard') }}" class="sidebar-item {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
                 <span class="icon"><x-icon name="dashboard" size="16" /></span>
                 <span>Dashboard</span>
             </a>
 
-            <div class="sidebar-section-label">Data Master</div>
-            <a href="{{ route('admin.drop-points.index') }}" class="sidebar-item {{ request()->routeIs('admin.drop-points.*') ? 'active' : '' }}">
-                <span class="icon"><x-icon name="map-pin" size="16" /></span>
-                <span>Drop Points</span>
+            <a href="{{ route('admin.orders.index') }}" class="sidebar-item {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}">
+                <span class="icon"><x-icon name="receipt" size="16" /></span>
+                <span>Kelola Pesanan</span>
+                @php
+                    $pendingCount = \App\Models\Order::where('status', 'menunggu_pembayaran')->whereNotNull('payment_proof')->count();
+                @endphp
+                @if($pendingCount > 0)
+                <span class="badge badge-warning" style="margin-left: auto; font-size: 0.675rem; padding: 2px 6px;">{{ $pendingCount }}</span>
+                @endif
             </a>
+
             <a href="{{ route('admin.packages.index') }}" class="sidebar-item {{ request()->routeIs('admin.packages.*') ? 'active' : '' }}">
                 <span class="icon"><x-icon name="package" size="16" /></span>
                 <span>Paket Sembako</span>
             </a>
 
-            <div class="sidebar-section-label">Transaksi</div>
-            <a href="{{ route('admin.orders.index') }}" class="sidebar-item {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}">
-                <span class="icon"><x-icon name="receipt" size="16" /></span>
-                <span>Kelola Pesanan</span>
+            <a href="{{ route('admin.drop-points.index') }}" class="sidebar-item {{ request()->routeIs('admin.drop-points.*') ? 'active' : '' }}">
+                <span class="icon"><x-icon name="map-pin" size="16" /></span>
+                <span>Drop Points</span>
             </a>
-            @php
-                $pendingCount = \App\Models\Order::where('status', 'menunggu_pembayaran')->whereNotNull('payment_proof')->count();
-            @endphp
-            @if($pendingCount > 0)
-            <a href="{{ route('admin.orders.index', ['status' => 'menunggu_pembayaran']) }}" class="sidebar-item" style="color: var(--warning);">
-                <span class="icon"><x-icon name="credit-card" size="16" /></span>
-                <span>Verifikasi Bayar</span>
-                <span class="badge badge-warning" style="margin-left: auto; font-size: 0.7rem;">{{ $pendingCount }}</span>
-            </a>
-            @endif
 
-            <div class="sidebar-section-label">Laporan</div>
             <a href="{{ route('admin.reports.index') }}" class="sidebar-item {{ request()->routeIs('admin.reports.*') ? 'active' : '' }}">
                 <span class="icon"><x-icon name="bar-chart" size="16" /></span>
                 <span>Laporan Penjualan</span>
