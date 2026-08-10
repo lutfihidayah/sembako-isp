@@ -1,85 +1,259 @@
 @extends('layouts.app')
 
-@section('title', 'Katalog Paket Sembako')
+@section('title', auth()->check() ? 'Katalog Paket Sembako' : 'Layanan Paket Sembako Jaringan Reseller ISP')
 
 @section('content')
 
 @guest
-<!-- HERO SECTION (GUEST) -->
-<section class="page-hero">
-    <div class="container">
-        <h1>Paket Sembako Reseller ISP</h1>
-        <p class="hero-subtitle">
-            Pesan online, bayar mudah, ambil langsung di Drop Point terdekat di wilayah Anda tanpa ongkos kirim.
-        </p>
+<!-- ============================================================
+     LANDING PAGE INFORMASI RESMI (UNTUK PENGUNJUNG / GUEST)
+     ============================================================ -->
 
-        <div class="hero-trust-list">
-            <div class="hero-trust-item">
-                <x-icon name="check-circle" size="15" />
-                <span>Kualitas Terjamin</span>
+<!-- HERO BANNER INFORMASI -->
+<section class="page-hero" style="padding: var(--space-2xl) 0 var(--space-xl);">
+    <div class="container">
+        <div style="max-width: 680px;">
+            <div class="hero-badge-pill">
+                <x-icon name="shield-check" size="14" />
+                <span>Layanan Resmi Jaringan Reseller ISP</span>
             </div>
-            <div class="hero-trust-item">
-                <x-icon name="map-pin" size="15" />
-                <span>{{ $dropPoints->count() }}+ Drop Point Tersebar</span>
+
+            <h1 style="font-size: 1.85rem; font-weight: 800; line-height: 1.25; margin-bottom: 10px;">
+                Belanja Paket Sembako Hemat, Ambil di Reseller ISP Terdekat
+            </h1>
+
+            <p class="hero-subtitle" style="font-size: 0.95rem; line-height: 1.6; margin-bottom: var(--space-lg);">
+                Program khusus bagi pelanggan jaringan internet ISP. Pesan paket sembako kebutuhan rumah tangga secara online, bayar mudah via Transfer Bank atau QRIS, dan ambil pesanan langsung di Drop Point reseller tanpa biaya pengiriman.
+            </p>
+
+            <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: var(--space-lg);">
+                <a href="{{ route('login') }}" class="btn btn-primary btn-lg" style="box-shadow: 0 4px 14px rgba(0,0,0,0.25); display: inline-flex; align-items: center; gap: 8px;">
+                    <x-icon name="user" size="18" />
+                    <span>Masuk ke Akun</span>
+                </a>
+                <a href="{{ route('register') }}" class="btn btn-ghost btn-lg" style="background: rgba(255,255,255,0.15); color: #fff; border-color: rgba(255,255,255,0.3); display: inline-flex; align-items: center; gap: 8px;">
+                    <span>Daftar Akun Baru</span>
+                </a>
             </div>
-            <div class="hero-trust-item">
-                <x-icon name="shield-check" size="15" />
-                <span>Transaksi Aman & Terpercaya</span>
+
+            <div class="hero-trust-list">
+                <div class="hero-trust-item">
+                    <x-icon name="check-circle" size="15" />
+                    <span>100% Bebas Ongkos Kirim</span>
+                </div>
+                <div class="hero-trust-item">
+                    <x-icon name="map-pin" size="15" />
+                    <span>{{ $dropPoints->count() }}+ Titik Drop Point Reseller</span>
+                </div>
+                <div class="hero-trust-item">
+                    <x-icon name="shield-check" size="15" />
+                    <span>Transaksi Aman & Terpercaya</span>
+                </div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- PANDUAN BELANJA (4 LANGKAH) -->
-<section class="how-it-works-section">
+<!-- KEUNGGULAN LAYANAN KITA -->
+<section class="section" style="background: #ffffff; padding: var(--space-2xl) 0;">
     <div class="container">
-        <div style="margin-bottom: var(--space-sm);">
-            <h3 style="margin-bottom: 2px; font-size: 1.05rem;">Cara Pesan Mudah</h3>
-            <p class="text-muted" style="margin-bottom: 0; font-size: 0.8rem;">4 langkah mudah belanja sembako hemat di reseller ISP.</p>
+        <div style="text-align: center; max-width: 600px; margin: 0 auto var(--space-xl);">
+            <div style="color: var(--primary-700); font-weight: 700; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 4px;">
+                Keunggulan Layanan
+            </div>
+            <h2 style="font-size: 1.4rem; color: var(--gray-900); margin-bottom: 6px;">
+                Mengapa Belanja Sembako Lewat Jaringan Reseller ISP?
+            </h2>
+            <p class="text-muted" style="font-size: 0.875rem; margin-bottom: 0;">
+                Solusi belanja praktis, hemat, dan terdekat langsung dari mitra reseller internet di lingkungan Anda.
+            </p>
+        </div>
+
+        <div class="landing-features-grid">
+            <div class="landing-feature-card">
+                <div class="landing-feature-icon">
+                    <x-icon name="truck" size="22" />
+                </div>
+                <h4>100% Bebas Ongkos Kirim</h4>
+                <p>Paket sembako diantar langsung ke Drop Point reseller terdekat tanpa biaya pengiriman tambahan sepeserpun.</p>
+            </div>
+
+            <div class="landing-feature-card">
+                <div class="landing-feature-icon">
+                    <x-icon name="tag" size="22" />
+                </div>
+                <h4>Harga Hemat & Kualitas Terjamin</h4>
+                <p>Isi paket sembako dikurasi dengan kualitas terbaik dan harga paket yang lebih bersahabat dibandingkan harga eceran pasar.</p>
+            </div>
+
+            <div class="landing-feature-card">
+                <div class="landing-feature-icon">
+                    <x-icon name="credit-card" size="22" />
+                </div>
+                <h4>Pembayaran Mudah & Aman</h4>
+                <p>Tersedia metode pembayaran Transfer Bank dan QRIS instan dengan verifikasi transaksi yang transparan dan cepat.</p>
+            </div>
+
+            <div class="landing-feature-card">
+                <div class="landing-feature-icon">
+                    <x-icon name="clipboard" size="22" />
+                </div>
+                <h4>Lacak Status Pesanan Jelas</h4>
+                <p>Pantau tahapan pesanan mulai dari proses belanja, pengiriman ke reseller, hingga notifikasi siap diambil.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CARA KERJA & PANDUAN PESAN (4 LANGKAH MUDAH) -->
+<section class="how-it-works-section" style="background: var(--gray-50); padding: var(--space-2xl) 0;">
+    <div class="container">
+        <div style="text-align: center; max-width: 600px; margin: 0 auto var(--space-lg);">
+            <div style="color: var(--primary-700); font-weight: 700; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 4px;">
+                Panduan Belanja
+            </div>
+            <h2 style="font-size: 1.35rem; color: var(--gray-900); margin-bottom: 6px;">
+                4 Langkah Mudah Mendapatkan Paket Sembako
+            </h2>
+            <p class="text-muted" style="font-size: 0.85rem; margin-bottom: 0;">
+                Alur belanja yang praktis dan terstruktur dari pemesanan hingga pengambilan.
+            </p>
         </div>
 
         <div class="steps-grid">
             <div class="step-card">
                 <div class="step-number">1</div>
                 <div class="step-icon-box">
-                    <x-icon name="package" size="16" />
+                    <x-icon name="package" size="18" />
                 </div>
-                <h4>1. Pilih Paket</h4>
-                <p>Pilih paket sembako sesuai kebutuhan Anda.</p>
+                <h4>1. Pilih Paket Sembako</h4>
+                <p>Pilih kategori paket hemat, standar, atau premium sesuai kebutuhan keluarga.</p>
             </div>
 
             <div class="step-card">
                 <div class="step-number">2</div>
                 <div class="step-icon-box">
-                    <x-icon name="map-pin" size="16" />
+                    <x-icon name="map-pin" size="18" />
                 </div>
-                <h4>2. Pilih Drop Point</h4>
-                <p>Tentukan lokasi reseller terdekat dari rumah.</p>
+                <h4>2. Tentukan Drop Point</h4>
+                <p>Pilih titik reseller ISP terdekat dari tempat tinggal Anda untuk lokasi ambil.</p>
             </div>
 
             <div class="step-card">
                 <div class="step-number">3</div>
                 <div class="step-icon-box">
-                    <x-icon name="credit-card" size="16" />
+                    <x-icon name="credit-card" size="18" />
                 </div>
-                <h4>3. Bayar & Upload</h4>
-                <p>Transfer via Bank atau QRIS dan unggah bukti.</p>
+                <h4>3. Bayar & Konfirmasi</h4>
+                <p>Selesaikan transfer pembayaran (Bank / QRIS) dan admin segera membelanjakan paket.</p>
             </div>
 
             <div class="step-card">
                 <div class="step-number">4</div>
                 <div class="step-icon-box">
-                    <x-icon name="check-circle" size="16" />
+                    <x-icon name="check-circle" size="18" />
                 </div>
-                <h4>4. Ambil Paket</h4>
-                <p>Ambil paket di Drop Point saat status siap.</p>
+                <h4>4. Ambil di Reseller</h4>
+                <p>Kunjungi Drop Point saat status pesanan 'Siap Diambil' dan bawa pulang sembako Anda.</p>
             </div>
         </div>
     </div>
 </section>
+
+<!-- INFORMASI JARINGAN DROP POINT -->
+@if($dropPoints->isNotEmpty())
+<section style="background: #ffffff; padding: var(--space-2xl) 0;">
+    <div class="container">
+        <details class="drop-point-accordion">
+            <summary class="drop-point-summary">
+                <div class="drop-point-summary-content">
+                    <div class="drop-point-icon">
+                        <x-icon name="map-pin" size="18" />
+                    </div>
+                    <div>
+                        <div style="font-weight: 700; font-size: 0.9rem; color: var(--gray-900);">
+                            Jaringan Lokasi Drop Point Reseller ISP
+                        </div>
+                        <div style="font-size: 0.775rem; color: var(--gray-500);">
+                            Tersedia di {{ $dropPoints->count() }} titik reseller aktif — Bebas Biaya Kirim
+                        </div>
+                    </div>
+                </div>
+                <div class="drop-point-toggle-btn">
+                    <span>Lihat Daftar Lokasi</span>
+                    <span class="drop-point-toggle-icon">
+                        <x-icon name="chevron-down" size="15" />
+                    </span>
+                </div>
+            </summary>
+
+            <div class="drop-point-body">
+                <div class="drop-point-grid">
+                    @foreach($dropPoints as $dp)
+                    <div class="drop-point-card">
+                        <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 6px;">
+                            <div style="font-weight: 700; font-size: 0.85rem; color: var(--gray-900);">
+                                {{ $dp->name }}
+                            </div>
+                            <span class="badge badge-success" style="font-size: 0.65rem; padding: 2px 6px;">
+                                {{ $dp->region }}
+                            </span>
+                        </div>
+
+                        <div style="font-size: 0.775rem; color: var(--gray-600); line-height: 1.4; margin-bottom: 8px;">
+                            {{ $dp->address }}
+                        </div>
+
+                        <div style="margin-top: auto; padding-top: 6px; border-top: 1px solid var(--gray-200); display: flex; align-items: center; justify-content: space-between; gap: 6px; font-size: 0.725rem; color: var(--gray-500);">
+                            <div style="display: inline-flex; align-items: center; gap: 4px;">
+                                <x-icon name="clock" size="12" />
+                                <span>{{ $dp->operational_hours ?? '08:00 - 20:00 WIB' }}</span>
+                            </div>
+
+                            @if($dp->contact_number)
+                            @php $cleanPhone = preg_replace('/[^0-9]/', '', $dp->contact_number); @endphp
+                            <a href="https://wa.me/{{ str_starts_with($cleanPhone, '0') ? '62' . substr($cleanPhone, 1) : $cleanPhone }}" target="_blank" class="btn btn-ghost btn-sm" style="padding: 2px 8px; height: 24px; font-size: 0.7rem; color: var(--primary-700); border-color: var(--primary-200); background: var(--primary-50); display: inline-flex; align-items: center; gap: 4px;">
+                                <x-icon name="whatsapp" size="12" />
+                                <span>WhatsApp</span>
+                            </a>
+                            @endif
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+        </details>
+    </div>
+</section>
+@endif
+
+<!-- CALL TO ACTION (CTA) -->
+<div class="container">
+    <div class="landing-cta-card">
+        <h3 style="color: #fff; font-size: 1.45rem; font-weight: 800; margin-bottom: 8px;">
+            Sudah Menjadi Pelanggan Jaringan Internet ISP?
+        </h3>
+        <p style="color: rgba(255,255,255,0.9); font-size: 0.9rem; max-width: 540px; margin: 0 auto var(--space-lg); line-height: 1.5;">
+            Masuk atau daftarkan akun Anda sekarang untuk melihat katalog lengkap dan mulai memesan paket sembako hemat.
+        </p>
+        <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+            <a href="{{ route('login') }}" class="btn btn-ghost btn-lg" style="background: #ffffff; color: var(--primary-700); font-weight: 700; border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+                Masuk Sekarang
+            </a>
+            <a href="{{ route('register') }}" class="btn btn-ghost btn-lg" style="background: rgba(255,255,255,0.15); color: #fff; border-color: rgba(255,255,255,0.3);">
+                Daftar Akun Baru
+            </a>
+        </div>
+    </div>
+</div>
 @endguest
 
+
 @auth
+<!-- ============================================================
+     ETALASE & KATALOG BELANJA (UNTUK PENGGUNA LOGIN / AUTH)
+     ============================================================ -->
+
 <!-- WELCOME HEADER (AUTHENTICATED) -->
 <section class="page-hero">
     <div class="container">
@@ -97,7 +271,6 @@
         </div>
     </div>
 </section>
-@endauth
 
 <!-- KATALOG PRODUK (E-COMMERCE APP STYLE) -->
 <section class="section" id="katalog" style="padding-top: var(--space-lg);">
@@ -216,7 +389,6 @@
                             Detail
                         </a>
                         @if(!$package->isOutOfStock())
-                        @auth
                         <form method="POST" action="{{ route('cart.add', $package) }}" style="flex: 1;">
                             @csrf
                             <input type="hidden" name="quantity" value="1">
@@ -225,12 +397,6 @@
                                 <span>Pesan</span>
                             </button>
                         </form>
-                        @else
-                        <a href="{{ route('login') }}" class="btn btn-primary btn-sm" style="flex: 1; padding: 4px 6px; font-size: 0.775rem; height: 32px; display: inline-flex; align-items: center; justify-content: center; gap: 4px;">
-                            <x-icon name="cart" size="13" />
-                            <span>Pesan</span>
-                        </a>
-                        @endauth
                         @else
                         <button class="btn btn-ghost btn-sm" disabled style="flex: 1; padding: 4px 6px; font-size: 0.775rem; height: 32px; opacity: .4;">Habis</button>
                         @endif
@@ -265,7 +431,7 @@
     </div>
 </section>
 
-<!-- DROP POINT ACCORDION DROPDOWN -->
+<!-- DROP POINT ACCORDION DROPDOWN (UNTUK USER LOGIN) -->
 @if($dropPoints->isNotEmpty())
 <div class="container" style="padding-bottom: var(--space-md);">
     <details class="drop-point-accordion">
@@ -329,5 +495,6 @@
     </details>
 </div>
 @endif
+@endauth
 
 @endsection

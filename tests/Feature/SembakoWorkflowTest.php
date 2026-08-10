@@ -26,10 +26,19 @@ class SembakoWorkflowTest extends TestCase
 
     public function test_home_page_loads_and_displays_packages(): void
     {
+        $user = User::first() ?? User::factory()->create();
+        $response = $this->actingAs($user)->get('/');
+        $response->assertStatus(200);
+        $response->assertSee('Daftar Paket Sembako');
+        $response->assertSee('Paket Sembako Hemat A');
+    }
+
+    public function test_guest_sees_landing_page_information(): void
+    {
         $response = $this->get('/');
         $response->assertStatus(200);
-        $response->assertSee('Katalog Paket');
-        $response->assertSee('Paket Sembako Hemat A');
+        $response->assertSee('Layanan Resmi Jaringan Reseller ISP');
+        $response->assertSee('100% Bebas Ongkos Kirim');
     }
 
     public function test_consumer_can_register_and_login(): void

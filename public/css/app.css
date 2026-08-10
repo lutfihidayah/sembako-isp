@@ -877,6 +877,75 @@ textarea.form-control { resize: vertical; min-height: 105px; }
 }
 
 /* ============================================================
+   LANDING PAGE INFORMATIVE SECTIONS (GUEST)
+   ============================================================ */
+.landing-features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: var(--space-md);
+}
+
+@media (max-width: 600px) {
+    .landing-features-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+}
+
+.landing-feature-card {
+    background: #ffffff;
+    border: 1.5px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    padding: var(--space-lg) var(--space-md);
+    transition: all var(--transition);
+    display: flex;
+    flex-direction: column;
+}
+
+.landing-feature-card:hover {
+    border-color: var(--primary-400);
+    box-shadow: 0 6px 18px rgba(0, 135, 61, 0.1);
+    transform: translateY(-2px);
+}
+
+.landing-feature-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-md);
+    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+    color: var(--primary-700);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: var(--space-sm);
+}
+
+.landing-feature-card h4 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--gray-900);
+    margin-bottom: 4px;
+}
+
+.landing-feature-card p {
+    font-size: 0.825rem;
+    color: var(--gray-600);
+    line-height: 1.45;
+    margin-bottom: 0;
+}
+
+.landing-cta-card {
+    background: linear-gradient(135deg, #043d1c 0%, #007033 50%, #00873d 100%);
+    color: #ffffff;
+    border-radius: var(--radius-xl);
+    padding: var(--space-2xl) var(--space-xl);
+    text-align: center;
+    margin: var(--space-2xl) 0 var(--space-xl);
+    position: relative;
+    overflow: hidden;
+}
+
+/* ============================================================
    E-COMMERCE CATEGORY ICONS BAR
    ============================================================ */
 .ecom-categories-bar {
