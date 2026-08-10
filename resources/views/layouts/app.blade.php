@@ -9,7 +9,7 @@
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2300873d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z'/%3E%3Cpath d='M3 6h18'/%3E%3Cpath d='M16 10a4 4 0 0 1-8 0'/%3E%3C/svg%3E">
     @stack('styles')
 </head>
-<body>
+<body class="@auth has-bottom-nav @endauth">
 
 <!-- TOP NAVBAR (E-COMMERCE STYLE WITH HEADER SEARCH) -->
 <nav class="navbar">
@@ -118,8 +118,9 @@
     </div>
 </footer>
 
+@auth
 <!-- ============================================================
-     MOBILE BOTTOM APP BAR NAVIGATION (APP-LIKE EXPERIENCE)
+     MOBILE BOTTOM APP BAR NAVIGATION (FOR LOGGED-IN USERS ONLY)
      ============================================================ -->
 <div class="mobile-bottom-nav">
     <!-- 1. Beranda -->
@@ -135,45 +136,26 @@
     </a>
 
     <!-- 3. Floating Center Action Button (Keranjang Belanja) -->
-    @auth
     <a href="{{ route('cart.index') }}" class="bottom-nav-center" title="Keranjang Belanja">
         <x-icon name="cart" size="24" />
         @if($cartCount > 0)
         <span class="cart-badge">{{ $cartCount > 99 ? '99+' : $cartCount }}</span>
         @endif
     </a>
-    @else
-    <a href="{{ route('login') }}" class="bottom-nav-center" title="Masuk Akun">
-        <x-icon name="cart" size="24" />
-    </a>
-    @endauth
 
     <!-- 4. Pesanan Saya -->
-    @auth
     <a href="{{ route('orders.index') }}" class="bottom-nav-item {{ request()->routeIs('orders.*') ? 'active' : '' }}">
         <div class="nav-icon"><x-icon name="clipboard" size="20" /></div>
         <span>Pesanan</span>
     </a>
-    @else
-    <a href="{{ route('login') }}" class="bottom-nav-item">
-        <div class="nav-icon"><x-icon name="clipboard" size="20" /></div>
-        <span>Pesanan</span>
-    </a>
-    @endauth
 
     <!-- 5. Akun / Profil -->
-    @auth
     <a href="{{ route('profile.edit') }}" class="bottom-nav-item {{ request()->routeIs('profile.*') ? 'active' : '' }}">
         <div class="nav-icon"><x-icon name="user" size="20" /></div>
         <span>Akun</span>
     </a>
-    @else
-    <a href="{{ route('login') }}" class="bottom-nav-item {{ request()->routeIs('login') ? 'active' : '' }}">
-        <div class="nav-icon"><x-icon name="user" size="20" /></div>
-        <span>Masuk</span>
-    </a>
-    @endauth
 </div>
+@endauth
 
 @stack('scripts')
 </body>
