@@ -35,11 +35,16 @@ class DashboardController extends Controller
             ->where('created_at', '>=', now()->subDays(7))
             ->select(DB::raw('DATE(created_at) as date'), DB::raw('SUM(total_price) as total'))
             ->groupBy('date')
-            ->orderBy('date')
             ->get()
             ->pluck('total', 'date')
             ->toArray();
 
-        return view('admin.dashboard', compact('stats', 'recentOrders', 'revenueChart'));
+        // Log aktivitas status pesanan terbaru
+        $recentActivities = \App\Models\OrderStatusLog::with('order.user')
+            ->orderBy('created_at', 'desc')
+            ->limit(5)
+            ->get();
+
+        return view('admin.dashboard', compact('stats', 'recentOrders', 'revenueChart', 'recentActivities'));
     }
 }

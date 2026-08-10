@@ -73,14 +73,21 @@
         </nav>
 
         <div class="sidebar-footer">
-            <div style="font-size: 0.8rem; color: rgba(255,255,255,.5); margin-bottom: var(--space-sm);">
-                Login sebagai:<br>
-                <strong style="color: rgba(255,255,255,.85);">{{ Auth::guard('admin')->user()->name }}</strong>
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                <div style="width: 32px; height: 32px; border-radius: var(--radius-full); background: #dcfce7; color: #00873d; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; flex-shrink: 0;">
+                    {{ strtoupper(substr(Auth::guard('admin')->user()->name, 0, 1)) }}
+                </div>
+                <div style="flex: 1; min-width: 0;">
+                    <div style="font-weight: 700; font-size: 0.8rem; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                        {{ Auth::guard('admin')->user()->name }}
+                    </div>
+                    <div style="font-size: 0.7rem; color: #64748b;">Administrator</div>
+                </div>
             </div>
             <form method="POST" action="{{ route('admin.logout') }}">
                 @csrf
-                <button type="submit" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 12px; border-radius: var(--radius-md); background: rgba(255,255,255,.08); border: none; color: rgba(255,255,255,.75); font-size: 0.875rem; cursor: pointer; font-family: inherit; transition: all var(--transition);">
-                    <x-icon name="logout" size="15" />
+                <button type="submit" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 7px 10px; border-radius: var(--radius-md); background: #f1f5f9; border: 1px solid #e2e8f0; color: #64748b; font-size: 0.775rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: all var(--transition);">
+                    <x-icon name="logout" size="14" />
                     <span>Keluar</span>
                 </button>
             </form>
