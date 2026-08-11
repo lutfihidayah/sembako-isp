@@ -85,27 +85,14 @@
                 </svg>
             </button>
 
-            <!-- Right: Action Circles (Cyan, Pink, Dark Avatar, Gray Logout) -->
+            <!-- Right: Action Circles (Dark Avatar, Gray Logout) -->
             <div class="header-actions-group">
-                <!-- 1. Cyan Circle: Lihat Toko Publik -->
-                <a href="{{ route('home') }}" target="_blank" class="header-circle-btn cyan" title="Buka Toko Publik (Frontend)">
-                    <x-icon name="eye" size="14" />
-                </a>
-
-                <!-- 2. Pink Circle: Notifikasi Pesanan Masuk -->
-                <a href="{{ route('admin.orders.index') }}" class="header-circle-btn pink" title="Kelola Pesanan">
-                    <x-icon name="receipt" size="13" />
-                    @if(!empty($pendingCount) && $pendingCount > 0)
-                    <span class="header-badge-dot"></span>
-                    @endif
-                </a>
-
-                <!-- 3. Dark Circle: User Avatar Initial -->
+                <!-- User Avatar Initial -->
                 <div class="header-circle-btn dark" title="{{ Auth::guard('admin')->user()->name }} (Administrator)">
                     {{ strtoupper(substr(Auth::guard('admin')->user()->name, 0, 1)) }}
                 </div>
 
-                <!-- 4. Gray Circle: Tombol Keluar (Logout) -->
+                <!-- Tombol Keluar (Logout) -->
                 <form method="POST" action="{{ route('admin.logout') }}" style="display: inline-flex; margin: 0;">
                     @csrf
                     <button type="submit" class="header-circle-btn gray" title="Keluar dari Akun">
