@@ -2474,18 +2474,21 @@ textarea.form-control { resize: vertical; min-height: 105px; }
 /* ============================================================
    MOBILE BOTTOM APP BAR NAVIGATION
    ============================================================ */
+/* ============================================================
+   MOBILE BOTTOM NAVIGATION BAR (PIXEL-PERFECT MATCH)
+   ============================================================ */
 .mobile-bottom-nav {
     display: none;
     position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
-    height: 64px;
+    height: 60px;
     background: #ffffff;
-    border-top: 1px solid var(--gray-200);
-    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.07);
+    border-top: 1px solid #f1f5f9;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
     z-index: 1000;
-    padding: 0 8px;
+    padding: 0 10px;
     align-items: center;
     justify-content: space-around;
 }
@@ -2496,18 +2499,14 @@ textarea.form-control { resize: vertical; min-height: 105px; }
     align-items: center;
     justify-content: center;
     gap: 3px;
-    color: var(--gray-500);
+    color: #64748b;
     text-decoration: none;
-    font-size: 0.725rem;
-    font-weight: 600;
+    font-size: 0.7rem;
+    font-weight: 500;
     transition: all var(--transition);
-    min-width: 58px;
-    padding: 6px 0;
-}
-
-.bottom-nav-item:hover,
-.bottom-nav-item.active {
-    color: var(--primary-600);
+    flex: 1;
+    height: 100%;
+    padding: 4px 0;
 }
 
 .bottom-nav-item .nav-icon {
@@ -2516,21 +2515,34 @@ textarea.form-control { resize: vertical; min-height: 105px; }
     justify-content: center;
     width: 24px;
     height: 24px;
+    color: inherit;
+    transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.bottom-nav-item:hover,
+.bottom-nav-item.active {
+    color: #00873d;
+    font-weight: 700;
+}
+
+.bottom-nav-item.active .nav-icon {
+    color: #00873d;
+    transform: translateY(-1px);
 }
 
 /* Floating Raised Center Button */
 .bottom-nav-center {
     position: relative;
-    top: -16px;
-    width: 56px;
-    height: 56px;
+    top: -14px;
+    width: 52px;
+    height: 52px;
     border-radius: var(--radius-full);
     background: linear-gradient(135deg, #00873d 0%, #00b853 100%);
     color: #ffffff;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 8px 20px rgba(0, 135, 61, 0.45);
+    box-shadow: 0 6px 18px rgba(0, 135, 61, 0.38);
     border: 3.5px solid #ffffff;
     transition: transform var(--transition), box-shadow var(--transition);
     flex-shrink: 0;
@@ -2539,8 +2551,8 @@ textarea.form-control { resize: vertical; min-height: 105px; }
 
 .bottom-nav-center:hover,
 .bottom-nav-center:active {
-    transform: translateY(-2px) scale(1.05);
-    box-shadow: 0 12px 24px rgba(0, 135, 61, 0.6);
+    transform: translateY(-2px) scale(1.06);
+    box-shadow: 0 10px 24px rgba(0, 135, 61, 0.5);
     color: #ffffff;
 }
 
@@ -2548,17 +2560,19 @@ textarea.form-control { resize: vertical; min-height: 105px; }
     position: absolute;
     top: -2px;
     right: -2px;
-    background: var(--accent-500);
-    color: #fff;
-    font-size: 11px;
+    background: #ef4444;
+    color: #ffffff;
+    font-size: 10px;
     font-weight: 800;
-    min-width: 20px;
-    height: 20px;
+    min-width: 18px;
+    height: 18px;
     border-radius: var(--radius-full);
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 2px solid #fff;
+    border: 2px solid #ffffff;
+    padding: 0 3px;
+    line-height: 1;
 }
 
 @media (max-width: 768px) {
@@ -2566,6 +2580,6 @@ textarea.form-control { resize: vertical; min-height: 105px; }
         display: flex;
     }
     body {
-        padding-bottom: 74px !important;
+        padding-bottom: 70px !important;
     }
 }

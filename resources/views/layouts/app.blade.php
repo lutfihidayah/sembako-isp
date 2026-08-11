@@ -122,44 +122,45 @@
 </footer>
 @endif
 
-@auth
+@if(!request()->routeIs('login', 'register', 'password.*'))
 <!-- ============================================================
-     MOBILE BOTTOM APP BAR NAVIGATION (FOR LOGGED-IN USERS ONLY)
+     MOBILE BOTTOM APP BAR NAVIGATION (PIXEL-PERFECT MATCH)
      ============================================================ -->
 <div class="mobile-bottom-nav">
     <!-- 1. Beranda -->
-    <a href="{{ route('home') }}" class="bottom-nav-item {{ request()->routeIs('home') && !request()->has('category') ? 'active' : '' }}">
+    <a href="{{ route('home') }}" class="bottom-nav-item {{ request()->routeIs('home') && !request()->has('category') && !request()->has('search') ? 'active' : '' }}">
         <div class="nav-icon"><x-icon name="home" size="20" /></div>
         <span>Beranda</span>
     </a>
 
     <!-- 2. Katalog / Produk -->
-    <a href="{{ route('home') }}#katalog" class="bottom-nav-item {{ request()->has('category') ? 'active' : '' }}">
+    <a href="{{ route('home') }}#katalog" class="bottom-nav-item {{ request()->has('category') || request()->has('search') ? 'active' : '' }}">
         <div class="nav-icon"><x-icon name="grid" size="20" /></div>
         <span>Katalog</span>
     </a>
 
     <!-- 3. Floating Center Action Button (Keranjang Belanja) -->
-    <a href="{{ route('cart.index') }}" class="bottom-nav-center" title="Keranjang Belanja">
-        <x-icon name="cart" size="24" />
+    <a href="{{ route('cart.index') }}" class="bottom-nav-center {{ request()->routeIs('cart.*') ? 'active' : '' }}" title="Keranjang Belanja">
+        <x-icon name="cart" size="22" />
+        @php $cartCount = collect(session('cart', []))->sum(); @endphp
         @if($cartCount > 0)
         <span class="cart-badge">{{ $cartCount > 99 ? '99+' : $cartCount }}</span>
         @endif
     </a>
 
     <!-- 4. Pesanan Saya -->
-    <a href="{{ route('orders.index') }}" class="bottom-nav-item {{ request()->routeIs('orders.*') ? 'active' : '' }}">
+    <a href="{{ auth()->check() ? route('orders.index') : route('login') }}" class="bottom-nav-item {{ request()->routeIs('orders.*') ? 'active' : '' }}">
         <div class="nav-icon"><x-icon name="clipboard" size="20" /></div>
         <span>Pesanan</span>
     </a>
 
     <!-- 5. Akun / Profil -->
-    <a href="{{ route('profile.edit') }}" class="bottom-nav-item {{ request()->routeIs('profile.*') ? 'active' : '' }}">
+    <a href="{{ auth()->check() ? route('profile.edit') : route('login') }}" class="bottom-nav-item {{ request()->routeIs('profile.*') || request()->routeIs('login') || request()->routeIs('register') ? 'active' : '' }}">
         <div class="nav-icon"><x-icon name="user" size="20" /></div>
         <span>Akun</span>
     </a>
 </div>
-@endauth
+@endif
 
 @stack('scripts')
 </body>
