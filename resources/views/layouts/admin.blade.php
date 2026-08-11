@@ -106,19 +106,7 @@
                             </div>
                         </div>
 
-                        <div class="dropdown-divider"></div>
-
-                        <a href="{{ route('admin.dashboard') }}" class="admin-dropdown-item">
-                            <x-icon name="dashboard" size="14" />
-                            <span>Dashboard</span>
-                        </a>
-
-                        <a href="{{ route('home') }}" target="_blank" class="admin-dropdown-item">
-                            <x-icon name="eye" size="14" />
-                            <span>Lihat Toko Publik</span>
-                        </a>
-
-                        <div class="dropdown-divider"></div>
+                        <div class="dropdown-divider" style="margin: 4px 0;"></div>
 
                         <form method="POST" action="{{ route('admin.logout') }}" style="margin: 0;">
                             @csrf
