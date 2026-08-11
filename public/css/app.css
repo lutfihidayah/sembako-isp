@@ -3254,3 +3254,28 @@ textarea.form-control { resize: vertical; min-height: 105px; }
     padding-bottom: 8px;
 }
 
+@media (max-width: 640px) {
+    .container, .container-sm {
+        padding-left: 12px !important;
+        padding-right: 12px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+    }
+    .section {
+        padding-top: 14px !important;
+    }
+    .card {
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+    }
+    .payment-method-card {
+        padding: 10px 12px !important;
+        gap: 10px !important;
+    }
+}
+
+
