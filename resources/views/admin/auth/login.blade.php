@@ -3,55 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Administrator — Sembako ISP</title>
+    <title>Login Administrator — Sembako ISP Portal</title>
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2300873d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z'/%3E%3Cpath d='M3 6h18'/%3E%3Cpath d='M16 10a4 4 0 0 1-8 0'/%3E%3C/svg%3E">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236366f1' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z'/%3E%3C/svg%3E">
 </head>
-<body style="background: #f8fafc; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: var(--space-lg);">
+<body class="admin-auth-body">
 
-<div class="auth-split-card" style="max-width: 880px;">
+<div class="admin-auth-card">
 
-    <!-- LEFT: VISUAL BRANDING PANEL -->
-    <div class="auth-split-visual" style="background: linear-gradient(145deg, #043d1c 0%, #064e24 50%, #00873d 100%);">
-        <div class="auth-visual-circle" style="width: 260px; height: 260px; top: -60px; left: -60px;"></div>
-        <div class="auth-visual-circle" style="width: 200px; height: 200px; bottom: -40px; right: -40px;"></div>
+    <!-- LEFT: EXECUTIVE VISUAL BRANDING PANEL -->
+    <div class="admin-auth-visual">
+        <!-- Decorative Glow Rings -->
+        <div class="auth-visual-circle" style="width: 260px; height: 260px; top: -60px; left: -60px; background: radial-gradient(circle, rgba(99,102,241,0.25) 0%, rgba(99,102,241,0) 70%);"></div>
+        <div class="auth-visual-circle" style="width: 220px; height: 220px; bottom: -40px; right: -40px; background: radial-gradient(circle, rgba(124,58,237,0.2) 0%, rgba(124,58,237,0) 70%);"></div>
 
+        <!-- Top Badge -->
         <div style="position: relative; z-index: 2;">
-            <span class="badge" style="background: rgba(255,255,255,0.15); color: #fff; border: 1px solid rgba(255,255,255,0.25); font-size: 0.75rem; padding: 4px 10px; border-radius: var(--radius-full);">
-                Portal Administrator
+            <span class="badge" style="background: rgba(99, 102, 241, 0.2); color: #c7d2fe; border: 1px solid rgba(129, 140, 248, 0.35); font-size: 0.75rem; padding: 4px 12px; border-radius: var(--radius-full); font-weight: 600; display: inline-flex; align-items: center; gap: 6px;">
+                <x-icon name="shield-check" size="13" />
+                <span>Portal Resmi Administrator ISP</span>
             </span>
         </div>
 
+        <!-- Center Shield Illustration & Headline -->
         <div class="auth-visual-center">
             <div class="auth-visual-badge">
-                <x-icon name="shield-check" size="40" />
+                <x-icon name="shield-check" size="44" />
             </div>
-            <h2 class="auth-visual-title">Manajemen Operasional & Penjualan</h2>
-            <p class="auth-visual-subtitle">
-                Akses panel kontrol untuk mengelola transaksi pesanan, drop point reseller, stok paket, dan laporan pendapatan.
+            <h2 class="auth-visual-title" style="color: #ffffff; font-size: 1.5rem; letter-spacing: -0.02em;">
+                Control Center Administrator
+            </h2>
+            <p class="auth-visual-subtitle" style="color: #c7d2fe; font-size: 0.85rem;">
+                Akses panel kontrol dan otorisasi khusus staf ISP untuk pengelolaan transaksi sembako, mitra drop point, stok paket, dan laporan pendapatan.
             </p>
         </div>
 
-        <div class="auth-visual-footer">
-            <div class="auth-visual-pill">
+        <!-- Bottom Security Badges -->
+        <div class="auth-visual-footer" style="border-top: 1px solid rgba(99, 102, 241, 0.25);">
+            <div class="auth-visual-pill" style="color: #c7d2fe;">
                 <x-icon name="lock" size="14" />
-                <span>Sesi Terenkripsi</span>
+                <span>256-Bit SSL Enkripsi</span>
             </div>
-            <div class="auth-visual-pill">
+            <div class="auth-visual-pill" style="color: #c7d2fe;">
                 <x-icon name="dashboard" size="14" />
-                <span>Sistem Real-Time</span>
+                <span>Real-Time Monitoring</span>
             </div>
         </div>
     </div>
 
-    <!-- RIGHT: ADMIN LOGIN FORM -->
-    <div class="auth-split-form">
+    <!-- RIGHT: EXECUTIVE LOGIN FORM PANEL -->
+    <div class="admin-auth-form">
         <div class="auth-form-header">
             <div class="auth-form-logo">
-                <x-icon name="logo" size="24" />
+                <x-icon name="shield-check" size="26" />
             </div>
-            <h1 class="auth-form-title">Login Administrator</h1>
-            <p class="auth-form-subtitle">Masukkan kredensial akun staf ISP</p>
+            <h1 class="auth-form-title" style="color: #0f172a; font-size: 1.4rem;">Otorisasi Administrator</h1>
+            <p class="auth-form-subtitle">Masukkan email staf dan kata sandi Anda</p>
         </div>
 
         @if($errors->any())
@@ -65,28 +72,32 @@
             @csrf
 
             <div class="form-group mb-md">
-                <label class="form-label" for="email">Email Administrator <span class="required">*</span></label>
-                <input type="email" name="email" id="email" class="form-control" value="{{ old('email') }}" required autofocus placeholder="admin@sembako.test" style="height: 42px;">
+                <label class="form-label" for="email" style="font-weight: 600; font-size: 0.825rem; color: #334155;">
+                    Alamat Email Admin <span class="required">*</span>
+                </label>
+                <input type="email" name="email" id="email" class="form-control admin-auth-input" value="{{ old('email') }}" required autofocus placeholder="admin@sembako.test" style="height: 42px; font-size: 0.875rem;">
             </div>
 
             <div class="form-group mb-md">
-                <label class="form-label" for="password">Password <span class="required">*</span></label>
-                <input type="password" name="password" id="password" class="form-control" required placeholder="••••••••" style="height: 42px;">
+                <label class="form-label" for="password" style="font-weight: 600; font-size: 0.825rem; color: #334155;">
+                    Password <span class="required">*</span>
+                </label>
+                <input type="password" name="password" id="password" class="form-control admin-auth-input" required placeholder="••••••••" style="height: 42px; font-size: 0.875rem;">
             </div>
 
             <div class="form-check mb-lg">
                 <input type="checkbox" name="remember" id="remember" value="1">
-                <label class="form-check-label" for="remember" style="font-size: 0.825rem; color: var(--gray-600);">Ingat sesi admin</label>
+                <label class="form-check-label" for="remember" style="font-size: 0.825rem; color: #64748b;">Ingat sesi admin di browser ini</label>
             </div>
 
-            <button type="submit" class="btn btn-primary btn-lg" style="width: 100%; height: 44px; font-weight: 700; box-shadow: 0 4px 14px rgba(0, 135, 61, 0.25); display: flex; align-items: center; justify-content: center; gap: 8px;">
-                <span>Masuk ke Panel Admin</span>
+            <button type="submit" class="btn admin-auth-btn" style="width: 100%; height: 44px; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; gap: 8px; border-radius: 10px;">
+                <span>Masuk ke Control Center</span>
                 <x-icon name="arrow-right" size="16" />
             </button>
         </form>
 
-        <div style="text-align: center; margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--gray-100);">
-            <a href="{{ route('home') }}" style="color: var(--gray-500); font-size: 0.825rem; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
+        <div style="text-align: center; margin-top: 24px; padding-top: 16px; border-top: 1px solid #f1f5f9;">
+            <a href="{{ route('home') }}" style="color: #64748b; font-size: 0.825rem; font-weight: 500; text-decoration: none; display: inline-flex; align-items: center; gap: 5px;">
                 <span>← Kembali ke Halaman Publik</span>
             </a>
         </div>
