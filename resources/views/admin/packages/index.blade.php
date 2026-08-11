@@ -144,6 +144,9 @@
             </thead>
             <tbody>
                 @foreach($packages as $index => $pkg)
+                @php
+                    $imgList = array_map(fn($img) => asset('storage/' . $img), $pkg->all_images);
+                @endphp
                 <tr style="{{ !$pkg->is_active ? 'background: #fafafa; opacity: 0.75;' : '' }}">
                     <!-- Index Number -->
                     <td style="text-align: center; color: #94a3b8; font-size: 0.75rem; font-weight: 600;">
@@ -153,12 +156,17 @@
                     <!-- Product Image & Name -->
                     <td>
                         <div style="display: flex; align-items: center; gap: 12px;">
-                            <!-- Clickable Image Thumbnail to View Large Photo -->
-                            <div style="width: 46px; height: 46px; border-radius: 8px; overflow: hidden; background: #f1f5f9; border: 1px solid #e2e8f0; flex-shrink: 0; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.15s ease;"
+                            <!-- Clickable Image Thumbnail to View Large Photo Gallery -->
+                            <div style="width: 46px; height: 46px; border-radius: 8px; overflow: hidden; background: #f1f5f9; border: 1px solid #e2e8f0; flex-shrink: 0; display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative;"
                                  title="Klik untuk melihat foto"
-                                 onclick="viewImagePreview('{{ $pkg->image ? asset('storage/' . $pkg->image) : '' }}', '{{ $pkg->name }}')">
-                                @if($pkg->image)
-                                <img src="{{ asset('storage/' . $pkg->image) }}" alt="{{ $pkg->name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                                 onclick="viewPackageGallery({{ json_encode($imgList) }}, '{{ addslashes($pkg->name) }}')">
+                                @if($pkg->primary_image)
+                                <img src="{{ asset('storage/' . $pkg->primary_image) }}" alt="{{ $pkg->name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                                @if(count($pkg->all_images) > 1)
+                                <span style="position: absolute; bottom: 2px; right: 2px; background: rgba(15,23,42,0.8); color: #fff; font-size: 0.55rem; font-weight: 800; padding: 1px 4px; border-radius: 3px; line-height: 1.1;">
+                                    +{{ count($pkg->all_images) }}
+                                </span>
+                                @endif
                                 @else
                                 <span style="color: #94a3b8;"><x-icon name="package" size="22" /></span>
                                 @endif
@@ -248,7 +256,7 @@
                     <td style="text-align: right;">
                         <div style="display: inline-flex; align-items: center; gap: 4px;">
                             <button type="button" class="btn btn-ghost btn-sm" style="padding: 4px 8px; font-size: 0.75rem; color: #00873d; border-radius: 6px; cursor: pointer;" title="Edit Paket"
-                                    onclick="openEditPackageModal({{ json_encode($pkg) }})">
+                                    onclick="openEditPackageModal({{ json_encode($pkg) }}, {{ json_encode($imgList) }})">
                                 <x-icon name="edit" size="13" />
                                 <span>Edit</span>
                             </button>
@@ -291,10 +299,10 @@
 @endif
 
 <!-- ============================================================
-     4. POPUP / MODAL CRUD PAKET SEMBAKO (CREATE & EDIT)
+     4. POPUP / MODAL CRUD PAKET SEMBAKO (MULTI-PHOTO SUPPORT)
      ============================================================ -->
 <div class="modal-backdrop" id="packageModal">
-    <div class="modal-dialog">
+    <div class="modal-dialog" style="max-width: 660px;">
         <form method="POST" id="packageForm" action="{{ route('admin.packages.store') }}" enctype="multipart/form-data">
             @csrf
             <div id="packageMethodField"></div>
@@ -303,7 +311,7 @@
             <div class="modal-header">
                 <div>
                     <div class="modal-title" id="packageModalTitle">Tambah Paket Sembako Baru</div>
-                    <div class="modal-subtitle">Isi rincian data paket sembako, foto, stok, dan harga</div>
+                    <div class="modal-subtitle">Isi rincian data paket sembako, unggah banyak foto, stok, dan harga</div>
                 </div>
                 <button type="button" class="modal-close-btn" onclick="closePackageModal()">
                     <x-icon name="x" size="16" />
@@ -338,22 +346,24 @@
                     </div>
                 </div>
 
-                <div class="grid grid-2" style="gap: 12px;">
-                    <div class="form-group">
-                        <label class="form-label" for="pkg_stock" style="font-size: 0.825rem;">Jumlah Stok Gudang (Unit) <span class="required">*</span></label>
-                        <input type="number" name="stock" id="pkg_stock" class="form-control" required min="0" placeholder="50" style="height: 38px; font-size: 0.875rem;">
-                    </div>
+                <div class="form-group">
+                    <label class="form-label" for="pkg_stock" style="font-size: 0.825rem;">Jumlah Stok Gudang (Unit) <span class="required">*</span></label>
+                    <input type="number" name="stock" id="pkg_stock" class="form-control" required min="0" placeholder="50" style="height: 38px; font-size: 0.875rem;">
+                </div>
 
-                    <!-- Photo Upload with Live Thumbnail Preview -->
-                    <div class="form-group">
-                        <label class="form-label" style="font-size: 0.825rem;">Foto Produk Sembako</label>
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <div id="pkg_preview_box" style="width: 44px; height: 44px; border-radius: 8px; border: 1.5px dashed #cbd5e1; background: #f8fafc; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0;">
-                                <img id="pkg_preview_img" src="" alt="Preview" style="display: none; width: 100%; height: 100%; object-fit: cover;">
-                                <span id="pkg_preview_icon" style="color: #94a3b8;"><x-icon name="camera" size="18" /></span>
-                            </div>
-                            <input type="file" name="image" id="pkg_image" class="form-control" accept="image/jpeg,image/png,image/webp" style="padding: 5px; font-size: 0.8rem; height: 38px; flex: 1;" onchange="previewPackageImage(this)">
-                        </div>
+                <!-- Multi-Photo Upload Area -->
+                <div class="form-group">
+                    <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px;">
+                        <label class="form-label" style="font-size: 0.825rem; margin-bottom: 0;">
+                            Foto Galeri Produk Sembako <span style="font-size: 0.725rem; font-weight: normal; color: #64748b;">(Bisa pilih banyak foto sekaligus, maks 8)</span>
+                        </label>
+                    </div>
+                    
+                    <input type="file" name="images[]" id="pkg_images" multiple accept="image/jpeg,image/png,image/webp" class="form-control" style="padding: 6px; font-size: 0.825rem; height: 38px; margin-bottom: 8px;" onchange="previewMultiPackageImages(this)">
+
+                    <!-- Multi-photo preview thumbnail strip -->
+                    <div id="pkg_multi_preview_container" style="display: flex; flex-wrap: wrap; gap: 8px; min-height: 52px; padding: 8px; background: #f8fafc; border-radius: 10px; border: 1.5px dashed #cbd5e1; align-items: center;">
+                        <span id="pkg_multi_placeholder" style="font-size: 0.75rem; color: #94a3b8; padding-left: 4px;">Pilih satu atau beberapa foto untuk melihat pratinjau...</span>
                     </div>
                 </div>
 
@@ -389,18 +399,21 @@
 </div>
 
 <!-- ============================================================
-     5. LIGHTBOX / PHOTO VIEWER MODAL
+     5. LIGHTBOX / MULTI-PHOTO VIEWER MODAL
      ============================================================ -->
 <div class="modal-backdrop" id="imageViewerModal">
-    <div class="modal-dialog" style="max-width: 480px; padding: 0; background: #ffffff; border-radius: 16px; overflow: hidden;">
+    <div class="modal-dialog" style="max-width: 520px; padding: 0; background: #ffffff; border-radius: 16px; overflow: hidden;">
         <div class="modal-header" style="border-bottom: 1px solid #f1f5f9; padding: 14px 18px;">
-            <div class="modal-title" id="imageViewerTitle" style="font-size: 0.95rem;">Foto Produk</div>
+            <div class="modal-title" id="imageViewerTitle" style="font-size: 0.95rem;">Galeri Foto Produk</div>
             <button type="button" class="modal-close-btn" onclick="closeImageViewer()">
                 <x-icon name="x" size="16" />
             </button>
         </div>
         <div style="padding: 16px; text-align: center; background: #f8fafc;">
-            <img id="imageViewerImg" src="" alt="Foto Produk" style="max-width: 100%; max-height: 380px; object-fit: contain; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+            <img id="imageViewerMainImg" src="" alt="Foto Produk" style="max-width: 100%; max-height: 380px; object-fit: contain; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+            
+            <!-- Thumbnail strip inside lightbox -->
+            <div id="imageViewerThumbs" style="display: flex; justify-content: center; gap: 8px; margin-top: 12px; flex-wrap: wrap;"></div>
         </div>
     </div>
 </div>
@@ -412,18 +425,23 @@ const packageForm = document.getElementById('packageForm');
 const packageMethodField = document.getElementById('packageMethodField');
 const packageModalTitle = document.getElementById('packageModalTitle');
 const packageSubmitBtn = document.getElementById('packageSubmitBtn');
-const previewImg = document.getElementById('pkg_preview_img');
-const previewIcon = document.getElementById('pkg_preview_icon');
+const previewContainer = document.getElementById('pkg_multi_preview_container');
 
-function previewPackageImage(input) {
-    if (input.files && input.files[0]) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            previewImg.src = e.target.result;
-            previewImg.style.display = 'block';
-            previewIcon.style.display = 'none';
+function previewMultiPackageImages(input) {
+    previewContainer.innerHTML = "";
+    if (input.files && input.files.length > 0) {
+        for (let i = 0; i < input.files.length; i++) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const imgWrap = document.createElement('div');
+                imgWrap.style.cssText = "width: 52px; height: 52px; border-radius: 8px; overflow: hidden; border: 1.5px solid #00873d; position: relative; background: #fff;";
+                imgWrap.innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;"><span style="position:absolute;top:1px;left:1px;background:#00873d;color:#fff;font-size:0.55rem;padding:0 3px;border-radius:2px;font-weight:800;">${i+1}</span>`;
+                previewContainer.appendChild(imgWrap);
+            }
+            reader.readAsDataURL(input.files[i]);
         }
-        reader.readAsDataURL(input.files[0]);
+    } else {
+        previewContainer.innerHTML = '<span id="pkg_multi_placeholder" style="font-size: 0.75rem; color: #94a3b8; padding-left: 4px;">Pilih satu atau beberapa foto untuk melihat pratinjau...</span>';
     }
 }
 
@@ -440,18 +458,15 @@ function openCreatePackageModal() {
     document.getElementById('pkg_stock').value = "50";
     document.getElementById('pkg_items').value = "";
     document.getElementById('pkg_description').value = "";
-    document.getElementById('pkg_image').value = "";
+    document.getElementById('pkg_images').value = "";
     document.getElementById('pkg_is_active').checked = true;
 
-    // Reset preview
-    previewImg.src = "";
-    previewImg.style.display = 'none';
-    previewIcon.style.display = 'block';
+    previewContainer.innerHTML = '<span id="pkg_multi_placeholder" style="font-size: 0.75rem; color: #94a3b8; padding-left: 4px;">Pilih satu atau beberapa foto untuk melihat pratinjau...</span>';
 
     packageModal.classList.add('open');
 }
 
-function openEditPackageModal(pkg) {
+function openEditPackageModal(pkg, existingImageUrls) {
     packageForm.action = "/admin/packages/" + pkg.id;
     packageMethodField.innerHTML = '<input type="hidden" name="_method" value="PATCH">';
     packageModalTitle.innerText = "Edit Paket Sembako: " + pkg.name;
@@ -463,18 +478,20 @@ function openEditPackageModal(pkg) {
     document.getElementById('pkg_price').value = pkg.price || "";
     document.getElementById('pkg_stock').value = pkg.stock !== undefined ? pkg.stock : "0";
     document.getElementById('pkg_description').value = pkg.description || "";
-    document.getElementById('pkg_image').value = "";
+    document.getElementById('pkg_images').value = "";
     document.getElementById('pkg_is_active').checked = Boolean(pkg.is_active);
 
-    // Image preview
-    if (pkg.image) {
-        previewImg.src = "/storage/" + pkg.image;
-        previewImg.style.display = 'block';
-        previewIcon.style.display = 'none';
+    // Existing images preview
+    previewContainer.innerHTML = "";
+    if (existingImageUrls && existingImageUrls.length > 0) {
+        existingImageUrls.forEach((url, i) => {
+            const imgWrap = document.createElement('div');
+            imgWrap.style.cssText = "width: 52px; height: 52px; border-radius: 8px; overflow: hidden; border: 1.5px solid #cbd5e1; position: relative; background: #fff;";
+            imgWrap.innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover;"><span style="position:absolute;top:1px;left:1px;background:#64748b;color:#fff;font-size:0.55rem;padding:0 3px;border-radius:2px;font-weight:800;">${i+1}</span>`;
+            previewContainer.appendChild(imgWrap);
+        });
     } else {
-        previewImg.src = "";
-        previewImg.style.display = 'none';
-        previewIcon.style.display = 'block';
+        previewContainer.innerHTML = '<span id="pkg_multi_placeholder" style="font-size: 0.75rem; color: #94a3b8; padding-left: 4px;">Belum ada foto yang diunggah. Pilih file untuk menambahkan foto baru.</span>';
     }
 
     // Items array to newline string
@@ -491,15 +508,32 @@ function closePackageModal() {
     packageModal.classList.remove('open');
 }
 
-// Lightbox Viewer
+// Lightbox Multi-Photo Viewer
 const imageViewerModal = document.getElementById('imageViewerModal');
-const imageViewerImg = document.getElementById('imageViewerImg');
+const imageViewerMainImg = document.getElementById('imageViewerMainImg');
+const imageViewerThumbs = document.getElementById('imageViewerThumbs');
 const imageViewerTitle = document.getElementById('imageViewerTitle');
 
-function viewImagePreview(url, title) {
-    if (!url) return;
-    imageViewerImg.src = url;
-    imageViewerTitle.innerText = title || "Foto Produk";
+function viewPackageGallery(imgUrls, title) {
+    if (!imgUrls || imgUrls.length === 0) return;
+    imageViewerTitle.innerText = title || "Galeri Foto Produk";
+    imageViewerMainImg.src = imgUrls[0];
+    
+    imageViewerThumbs.innerHTML = "";
+    if (imgUrls.length > 1) {
+        imgUrls.forEach((url, index) => {
+            const thumb = document.createElement('img');
+            thumb.src = url;
+            thumb.style.cssText = `width: 44px; height: 44px; border-radius: 6px; object-fit: cover; cursor: pointer; border: 2px solid ${index === 0 ? '#00873d' : '#e2e8f0'};`;
+            thumb.onclick = function() {
+                imageViewerMainImg.src = url;
+                imageViewerThumbs.querySelectorAll('img').forEach(t => t.style.borderColor = '#e2e8f0');
+                thumb.style.borderColor = '#00873d';
+            };
+            imageViewerThumbs.appendChild(thumb);
+        });
+    }
+
     imageViewerModal.classList.add('open');
 }
 

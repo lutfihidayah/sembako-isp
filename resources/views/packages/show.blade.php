@@ -12,22 +12,46 @@
         </a>
     </div>
 
+    @php
+        $allImages = $package->all_images;
+        $imageUrls = array_map(fn($img) => asset('storage/' . $img), $allImages);
+    @endphp
+
     <div class="layout-split-equal">
 
-        <!-- Left: Image with Fullscreen Lightbox -->
+        <!-- ============================================================
+             LEFT: MULTI-PHOTO PRODUCT GALLERY
+             ============================================================ -->
         <div>
-            @if($package->image)
-            <div style="position: relative; overflow: hidden; border-radius: var(--radius-lg); border: 1px solid var(--gray-200); box-shadow: var(--shadow-sm); cursor: pointer;"
-                 onclick="openImageLightbox('{{ asset('storage/' . $package->image) }}')"
+            @if(!empty($imageUrls))
+            <!-- Main Active Image -->
+            <div style="position: relative; overflow: hidden; border-radius: var(--radius-lg); border: 1px solid var(--gray-200); box-shadow: var(--shadow-sm); cursor: pointer; background: #f8fafc;"
+                 onclick="openImageLightbox(currentGalleryIndex)"
                  title="Klik untuk memperbesar foto">
-                <img src="{{ asset('storage/' . $package->image) }}" alt="{{ $package->name }}"
-                     style="width: 100%; max-height: 380px; object-fit: cover; display: block; transition: transform 0.2s ease;">
-                <div style="position: absolute; bottom: 8px; right: 8px; background: rgba(15,23,42,0.7); color: #fff; font-size: 0.7rem; font-weight: 600; padding: 3px 8px; border-radius: var(--radius-full); display: flex; align-items: center; gap: 4px;">
+                <img id="mainGalleryImg" src="{{ $imageUrls[0] }}" alt="{{ $package->name }}"
+                     style="width: 100%; height: 340px; object-fit: cover; display: block; transition: opacity 0.2s ease;">
+                <div style="position: absolute; bottom: 10px; right: 10px; background: rgba(15,23,42,0.75); color: #fff; font-size: 0.7rem; font-weight: 600; padding: 4px 10px; border-radius: var(--radius-full); display: flex; align-items: center; gap: 4px; backdrop-filter: blur(4px);">
                     <x-icon name="search" size="12" />
-                    <span>Perbesar Foto</span>
+                    <span id="galleryCounter">1 / {{ count($imageUrls) }}</span>
                 </div>
             </div>
+
+            <!-- Thumbnail Carousel / Strip (if more than 1 image) -->
+            @if(count($imageUrls) > 1)
+            <div style="display: flex; gap: 8px; margin-top: 12px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none;" id="thumbStrip">
+                @foreach($imageUrls as $idx => $url)
+                <div onclick="switchGalleryImage({{ $idx }})"
+                     class="gallery-thumb-item"
+                     id="thumb-{{ $idx }}"
+                     style="width: 64px; height: 64px; border-radius: 8px; overflow: hidden; cursor: pointer; border: 2.5px solid {{ $idx === 0 ? '#00873d' : '#e2e8f0' }}; flex-shrink: 0; background: #fff; transition: all 0.15s ease;">
+                    <img src="{{ $url }}" alt="Thumbnail {{ $idx + 1 }}" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                @endforeach
+            </div>
+            @endif
+
             @else
+            <!-- Placeholder if no image -->
             <div style="width: 100%; height: 260px; background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-radius: var(--radius-lg); border: 1px solid var(--gray-200); display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--primary-700); gap: 10px;">
                 <div style="width: 60px; height: 60px; background: rgba(255,255,255,0.8); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center;">
                     <x-icon name="package" size="32" />
@@ -37,7 +61,9 @@
             @endif
         </div>
 
-        <!-- Right: Details -->
+        <!-- ============================================================
+             RIGHT: PRODUCT DETAILS & BUY ACTION
+             ============================================================ -->
         <div>
             @if($package->category)
             <span class="badge badge-primary" style="margin-bottom: 8px; font-size: 0.75rem;">{{ $package->category }}</span>
@@ -105,17 +131,17 @@
                     <div style="display: flex; align-items: center; border: 1.5px solid var(--gray-200); border-radius: var(--radius-md); overflow: hidden; background: #fff; flex-shrink: 0;">
                         <button type="button" onclick="changeQty(-1)" style="width: 36px; height: 42px; border: none; background: var(--gray-50); cursor: pointer; font-size: 1.1rem; font-family: inherit;">−</button>
                         <input type="number" name="quantity" id="qty-input" value="1" min="1" max="{{ $package->stock }}"
-                               style="width: 44px; height: 42px; border: none; text-align: center; font-size: 0.95rem; font-weight: 600; font-family: inherit; color: var(--gray-800); outline: none;">
+                                style="width: 44px; height: 42px; border: none; text-align: center; font-size: 0.95rem; font-weight: 600; font-family: inherit; color: var(--gray-800); outline: none;">
                         <button type="button" onclick="changeQty(1)" style="width: 36px; height: 42px; border: none; background: var(--gray-50); cursor: pointer; font-size: 1.1rem; font-family: inherit;">+</button>
                     </div>
 
-                    <!-- Button 1: Tambah ke Keranjang (Icon on Mobile, Icon+Text on Desktop) -->
+                    <!-- Button 1: Tambah ke Keranjang -->
                     <button type="submit" name="action" value="add_to_cart" class="btn btn-ghost btn-icon-mobile" style="height: 42px; border: 1.5px solid var(--primary-400); color: var(--primary-700); background: var(--primary-50);" title="Tambah ke Keranjang">
                         <x-icon name="cart" size="18" />
                         <span class="btn-text" style="margin-left: 6px;">+ Keranjang</span>
                     </button>
 
-                    <!-- Button 2: Pesan Sekarang (Direct to Checkout) -->
+                    <!-- Button 2: Pesan Sekarang -->
                     <button type="submit" name="action" value="buy_now" class="btn btn-primary" style="flex: 1; height: 42px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; white-space: nowrap;">
                         <x-icon name="credit-card" size="16" />
                         <span>Pesan Sekarang</span>
@@ -134,9 +160,11 @@
 </div>
 </div>
 
-<!-- Image Lightbox Modal -->
+<!-- ============================================================
+     FULLSCREEN PHOTO LIGHTBOX MODAL
+     ============================================================ -->
 <div class="modal-backdrop" id="productLightbox" style="z-index: 9999;">
-    <div class="modal-dialog" style="max-width: 540px; background: #ffffff; border-radius: 16px; overflow: hidden; padding: 0;">
+    <div class="modal-dialog" style="max-width: 580px; background: #ffffff; border-radius: 16px; overflow: hidden; padding: 0;">
         <div class="modal-header" style="padding: 12px 18px; border-bottom: 1px solid #f1f5f9;">
             <div style="font-weight: 700; font-size: 0.95rem; color: #0f172a;">{{ $package->name }}</div>
             <button type="button" class="modal-close-btn" onclick="closeImageLightbox()">
@@ -144,28 +172,61 @@
             </button>
         </div>
         <div style="padding: 16px; background: #f8fafc; text-align: center;">
-            <img id="lightboxImg" src="" alt="{{ $package->name }}" style="max-width: 100%; max-height: 480px; object-fit: contain; border-radius: 10px; box-shadow: 0 4px 14px rgba(0,0,0,0.08);">
+            <img id="lightboxImg" src="" alt="{{ $package->name }}" style="max-width: 100%; max-height: 440px; object-fit: contain; border-radius: 10px; box-shadow: 0 4px 14px rgba(0,0,0,0.08);">
+            
+            <!-- Lightbox Thumbnail Strip -->
+            @if(count($imageUrls) > 1)
+            <div style="display: flex; justify-content: center; gap: 8px; margin-top: 14px; flex-wrap: wrap;">
+                @foreach($imageUrls as $idx => $url)
+                <img src="{{ $url }}" onclick="switchLightboxImage({{ $idx }})" class="lb-thumb" id="lb-thumb-{{ $idx }}"
+                     style="width: 48px; height: 48px; border-radius: 6px; object-fit: cover; cursor: pointer; border: 2px solid {{ $idx === 0 ? '#00873d' : '#e2e8f0' }};">
+                @endforeach
+            </div>
+            @endif
         </div>
     </div>
 </div>
 
 @push('scripts')
 <script>
-function changeQty(delta) {
-    const input = document.getElementById('qty-input');
-    const max = parseInt(input.max);
-    let val = parseInt(input.value) + delta;
-    if (val < 1) val = 1;
-    if (val > max) val = max;
-    input.value = val;
+const galleryUrls = @json($imageUrls);
+let currentGalleryIndex = 0;
+
+function switchGalleryImage(index) {
+    if (!galleryUrls[index]) return;
+    currentGalleryIndex = index;
+    const mainImg = document.getElementById('mainGalleryImg');
+    mainImg.style.opacity = '0.4';
+    setTimeout(() => {
+        mainImg.src = galleryUrls[index];
+        mainImg.style.opacity = '1';
+    }, 100);
+
+    const counter = document.getElementById('galleryCounter');
+    if (counter) {
+        counter.innerText = (index + 1) + ' / ' + galleryUrls.length;
+    }
+
+    document.querySelectorAll('.gallery-thumb-item').forEach((item, idx) => {
+        item.style.borderColor = idx === index ? '#00873d' : '#e2e8f0';
+    });
 }
 
 const productLightbox = document.getElementById('productLightbox');
 const lightboxImg = document.getElementById('lightboxImg');
 
-function openImageLightbox(url) {
-    lightboxImg.src = url;
+function openImageLightbox(index = 0) {
+    if (!galleryUrls || galleryUrls.length === 0) return;
+    switchLightboxImage(index);
     productLightbox.classList.add('open');
+}
+
+function switchLightboxImage(index) {
+    if (!galleryUrls[index]) return;
+    lightboxImg.src = galleryUrls[index];
+    document.querySelectorAll('.lb-thumb').forEach((thumb, idx) => {
+        thumb.style.borderColor = idx === index ? '#00873d' : '#e2e8f0';
+    });
 }
 
 function closeImageLightbox() {
@@ -179,6 +240,15 @@ productLightbox.addEventListener('click', function(e) {
 document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') closeImageLightbox();
 });
+
+function changeQty(delta) {
+    const input = document.getElementById('qty-input');
+    const max = parseInt(input.max);
+    let val = parseInt(input.value) + delta;
+    if (val < 1) val = 1;
+    if (val > max) val = max;
+    input.value = val;
+}
 </script>
 @endpush
 

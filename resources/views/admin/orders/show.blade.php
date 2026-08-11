@@ -168,8 +168,8 @@
                 @foreach($order->items as $item)
                 <div style="display: flex; align-items: center; gap: var(--space-md); padding: var(--space-md) var(--space-lg); border-bottom: 1px solid var(--gray-50);">
                     <div style="width: 52px; height: 52px; border-radius: var(--radius-md); overflow: hidden; background: var(--primary-50); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                        @if($item->package && $item->package->image)
-                        <img src="{{ asset('storage/' . $item->package->image) }}" style="width: 100%; height: 100%; object-fit: cover;">
+                        @if($item->package && $item->package->primary_image)
+                        <img src="{{ asset('storage/' . $item->package->primary_image) }}" alt="{{ $item->package->name }}" style="width: 100%; height: 100%; object-fit: cover;">
                         @else
                         <x-icon name="package" size="24" />
                         @endif

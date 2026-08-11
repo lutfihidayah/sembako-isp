@@ -91,15 +91,34 @@ class PackageController extends Controller
             'stock'       => ['required', 'integer', 'min:0'],
             'category'    => ['nullable', 'string', 'max:50'],
             'image'       => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'images'      => ['nullable', 'array', 'max:8'],
+            'images.*'    => ['image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
             'is_active'   => ['boolean'],
         ]);
 
-        // Parse items dari textarea (satu baris = satu item)
         $data['items'] = $this->parseItems($request->input('items', ''));
         $data['is_active'] = $request->boolean('is_active', true);
 
+        $uploadedImages = [];
+
+        // Handle multiple images
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $imgFile) {
+                $uploadedImages[] = $imgFile->store('packages', 'public');
+            }
+        }
+
+        // Handle single image fallback
         if ($request->hasFile('image')) {
-            $data['image'] = $request->file('image')->store('packages', 'public');
+            $singlePath = $request->file('image')->store('packages', 'public');
+            if (empty($uploadedImages)) {
+                $uploadedImages[] = $singlePath;
+            }
+        }
+
+        if (!empty($uploadedImages)) {
+            $data['images'] = $uploadedImages;
+            $data['image'] = $uploadedImages[0];
         }
 
         Package::create($data);
@@ -122,17 +141,35 @@ class PackageController extends Controller
             'stock'       => ['required', 'integer', 'min:0'],
             'category'    => ['nullable', 'string', 'max:50'],
             'image'       => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'images'      => ['nullable', 'array', 'max:8'],
+            'images.*'    => ['image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
             'is_active'   => ['boolean'],
         ]);
 
         $data['items'] = $this->parseItems($request->input('items', ''));
         $data['is_active'] = $request->boolean('is_active');
 
-        if ($request->hasFile('image')) {
+        // Handle new multiple images
+        if ($request->hasFile('images')) {
+            // Delete old images
+            foreach ($package->all_images as $oldImg) {
+                Storage::disk('public')->delete($oldImg);
+            }
+
+            $uploadedImages = [];
+            foreach ($request->file('images') as $imgFile) {
+                $uploadedImages[] = $imgFile->store('packages', 'public');
+            }
+
+            $data['images'] = $uploadedImages;
+            $data['image'] = $uploadedImages[0];
+        } elseif ($request->hasFile('image')) {
             if ($package->image) {
                 Storage::disk('public')->delete($package->image);
             }
-            $data['image'] = $request->file('image')->store('packages', 'public');
+            $singlePath = $request->file('image')->store('packages', 'public');
+            $data['image'] = $singlePath;
+            $data['images'] = [$singlePath];
         }
 
         $package->update($data);
@@ -142,8 +179,8 @@ class PackageController extends Controller
 
     public function destroy(Package $package)
     {
-        if ($package->image) {
-            Storage::disk('public')->delete($package->image);
+        foreach ($package->all_images as $oldImg) {
+            Storage::disk('public')->delete($oldImg);
         }
         $package->delete();
         return redirect()->route('admin.packages.index')

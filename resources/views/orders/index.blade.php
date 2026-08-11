@@ -153,8 +153,8 @@
             @foreach($order->items as $item)
             <a href="{{ route('orders.show', $order) }}" class="shopee-card-item">
                 <!-- Thumbnail -->
-                @if($item->package && $item->package->image)
-                <img src="{{ asset('storage/' . $item->package->image) }}" alt="{{ $item->package->name }}" class="shopee-item-img">
+                @if($item->package && $item->package->primary_image)
+                <img src="{{ asset('storage/' . $item->package->primary_image) }}" alt="{{ $item->package->name }}" class="shopee-item-img">
                 @else
                 <div class="shopee-item-img" style="display: flex; align-items: center; justify-content: center; color: #94a3b8;">
                     <x-icon name="package" size="28" />

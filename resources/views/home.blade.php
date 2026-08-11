@@ -348,8 +348,14 @@
             <div class="ecom-product-card">
                 <!-- Image or Decorative Header -->
                 <div style="position: relative; overflow: hidden;">
-                    @if($package->image)
-                    <img src="{{ asset('storage/' . $package->image) }}" alt="{{ $package->name }}" class="ecom-card-img">
+                    @if($package->primary_image)
+                    <img src="{{ asset('storage/' . $package->primary_image) }}" alt="{{ $package->name }}" class="ecom-card-img">
+                    @if(count($package->all_images) > 1)
+                    <span style="position: absolute; bottom: 6px; left: 6px; background: rgba(15,23,42,0.75); color: #fff; font-size: 0.6rem; font-weight: 700; padding: 2px 6px; border-radius: var(--radius-full); display: flex; align-items: center; gap: 3px; backdrop-filter: blur(4px);">
+                        <x-icon name="search" size="10" />
+                        <span>{{ count($package->all_images) }} Foto</span>
+                    </span>
+                    @endif
                     @else
                     <div class="ecom-card-placeholder">
                         <x-icon name="package" size="28" />

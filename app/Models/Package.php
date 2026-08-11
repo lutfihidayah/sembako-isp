@@ -16,12 +16,14 @@ class Package extends Model
         'price',
         'stock',
         'image',
+        'images',
         'category',
         'is_active',
     ];
 
     protected $casts = [
         'items'     => 'array',
+        'images'    => 'array',
         'price'     => 'decimal:2',
         'is_active' => 'boolean',
     ];
@@ -43,9 +45,26 @@ class Package extends Model
 
     public function getImageUrlAttribute(): string
     {
-        if ($this->image) {
-            return asset('storage/' . $this->image);
+        $primary = $this->primary_image;
+        if ($primary) {
+            return asset('storage/' . $primary);
         }
         return asset('images/package-placeholder.png');
+    }
+
+    public function getPrimaryImageAttribute(): ?string
+    {
+        if (!empty($this->images) && is_array($this->images) && count($this->images) > 0) {
+            return $this->images[0];
+        }
+        return $this->image ?: null;
+    }
+
+    public function getAllImagesAttribute(): array
+    {
+        if (!empty($this->images) && is_array($this->images) && count($this->images) > 0) {
+            return $this->images;
+        }
+        return $this->image ? [$this->image] : [];
     }
 }
