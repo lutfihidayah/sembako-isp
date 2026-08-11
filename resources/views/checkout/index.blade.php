@@ -46,29 +46,41 @@
                         @if($dropPoints->isEmpty())
                         <div class="alert alert-warning" style="font-size: 0.8rem;">Belum ada Drop Point aktif. Silakan hubungi admin.</div>
                         @else
-                        <!-- Dropdown Select -->
-                        <div style="margin-bottom: 12px;">
-                            <label for="drop_point_select" style="display: block; font-size: 0.775rem; font-weight: 700; color: #475569; margin-bottom: 6px;">
+                        <!-- Custom Dropdown Selector -->
+                        <div style="margin-bottom: 12px; position: relative;">
+                            <label style="display: block; font-size: 0.775rem; font-weight: 700; color: #475569; margin-bottom: 6px;">
                                 Lokasi Drop Point Reseller:
                             </label>
-                            <div style="position: relative;">
-                                <select name="drop_point_id" id="drop_point_select" class="form-control" style="width: 100%; padding: 10px 14px; border-radius: 8px; border: 1.5px solid #cbd5e1; font-size: 0.875rem; font-weight: 600; color: #0f172a; background-color: #fff; appearance: none; -webkit-appearance: none; cursor: pointer;" onchange="updateSelectedDropPointInfo(this.value)">
-                                    <option value="" disabled>-- Pilih Drop Point --</option>
-                                    @foreach($dropPoints as $dp)
-                                    <option value="{{ $dp->id }}"
-                                            data-name="{{ $dp->name }}"
-                                            data-region="{{ $dp->region }}"
-                                            data-address="{{ $dp->address }}"
-                                            data-hours="{{ $dp->operational_hours }}"
-                                            data-contact="{{ $dp->contact_number }}"
-                                            {{ ($user->drop_point_id == $dp->id || old('drop_point_id') == $dp->id) ? 'selected' : '' }}>
-                                        📍 {{ $dp->name }} — {{ $dp->region }}
-                                    </option>
-                                    @endforeach
-                                </select>
-                                <div style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); pointer-events: none; color: #64748b;">
-                                    ▼
+                            
+                            <input type="hidden" name="drop_point_id" id="drop_point_input" value="{{ $user->drop_point_id ?? ($dropPoints->first()->id ?? '') }}">
+
+                            <!-- Dropdown Trigger Button -->
+                            <div id="dp_dropdown_trigger" onclick="toggleDpDropdown()" style="width: 100%; box-sizing: border-box; padding: 10px 14px; border-radius: 10px; border: 1.5px solid #cbd5e1; background: #ffffff; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 8px; transition: all 0.15s ease;">
+                                <div style="display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1;">
+                                    <span style="font-size: 1rem;">📍</span>
+                                    <span id="dp_trigger_label" style="font-size: 0.85rem; font-weight: 700; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                        Pilih Drop Point...
+                                    </span>
                                 </div>
+                                <span id="dp_dropdown_arrow" style="font-size: 0.7rem; color: #64748b; transition: transform 0.2s;">▼</span>
+                            </div>
+
+                            <!-- Dropdown Menu Options List -->
+                            <div id="dp_dropdown_menu" style="display: none; position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 12px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.05); z-index: 100; max-height: 240px; overflow-y: auto; padding: 4px;">
+                                @foreach($dropPoints as $dp)
+                                <div class="dp-menu-option" 
+                                     id="dp-opt-{{ $dp->id }}"
+                                     onclick="selectCustomDropPoint({{ json_encode($dp) }})"
+                                     style="padding: 10px 12px; border-radius: 8px; cursor: pointer; transition: background 0.15s; border-bottom: 1px solid #f8fafc;">
+                                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-bottom: 2px;">
+                                        <span style="font-weight: 700; font-size: 0.85rem; color: #0f172a;">{{ $dp->name }}</span>
+                                        <span style="font-size: 0.675rem; font-weight: 700; color: #00873d; background: #dcfce7; padding: 2px 6px; border-radius: 4px;">{{ $dp->region }}</span>
+                                    </div>
+                                    <div style="font-size: 0.75rem; color: #64748b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                        {{ $dp->address }}
+                                    </div>
+                                </div>
+                                @endforeach
                             </div>
                         </div>
 
@@ -188,18 +200,56 @@
 
 @push('scripts')
 <script>
-function updateSelectedDropPointInfo(val) {
-    const select = document.getElementById('drop_point_select');
-    if (!select) return;
-    const selectedOpt = select.options[select.selectedIndex];
-    if (selectedOpt) {
-        document.getElementById('dp_detail_name').innerText = selectedOpt.dataset.name || "-";
-        document.getElementById('dp_detail_region').innerText = selectedOpt.dataset.region || "-";
-        document.getElementById('dp_detail_address').innerText = selectedOpt.dataset.address || "-";
-        document.getElementById('dp_detail_hours').innerText = selectedOpt.dataset.hours || "-";
-        document.getElementById('dp_detail_contact').innerText = selectedOpt.dataset.contact || "-";
+const dpDropdownMenu = document.getElementById('dp_dropdown_menu');
+const dpDropdownTrigger = document.getElementById('dp_dropdown_trigger');
+const dpDropdownArrow = document.getElementById('dp_dropdown_arrow');
+const dpInput = document.getElementById('drop_point_input');
+const dpTriggerLabel = document.getElementById('dp_trigger_label');
+
+function toggleDpDropdown() {
+    if (dpDropdownMenu.style.display === 'none' || !dpDropdownMenu.style.display) {
+        dpDropdownMenu.style.display = 'block';
+        dpDropdownArrow.style.transform = 'rotate(180deg)';
+        dpDropdownTrigger.style.borderColor = '#00873d';
+    } else {
+        closeDpDropdown();
     }
 }
+
+function closeDpDropdown() {
+    dpDropdownMenu.style.display = 'none';
+    dpDropdownArrow.style.transform = 'rotate(0deg)';
+    dpDropdownTrigger.style.borderColor = '#cbd5e1';
+}
+
+function selectCustomDropPoint(dp) {
+    if (!dp) return;
+    dpInput.value = dp.id;
+    dpTriggerLabel.innerText = dp.name + ' (' + dp.region + ')';
+    
+    // Update live preview detail box
+    document.getElementById('dp_detail_name').innerText = dp.name;
+    document.getElementById('dp_detail_region').innerText = dp.region;
+    document.getElementById('dp_detail_address').innerText = dp.address;
+    document.getElementById('dp_detail_hours').innerText = dp.operational_hours;
+    document.getElementById('dp_detail_contact').innerText = dp.contact_number;
+
+    // Highlight active option in list
+    document.querySelectorAll('.dp-menu-option').forEach(opt => {
+        opt.style.background = '#ffffff';
+    });
+    const selectedOpt = document.getElementById('dp-opt-' + dp.id);
+    if (selectedOpt) selectedOpt.style.background = '#f0fdf4';
+
+    closeDpDropdown();
+}
+
+// Close when clicking outside
+document.addEventListener('click', function(e) {
+    if (!dpDropdownTrigger.contains(e.target) && !dpDropdownMenu.contains(e.target)) {
+        closeDpDropdown();
+    }
+});
 
 function selectPaymentMethod(method) {
     document.querySelectorAll('.payment-method-card').forEach(c => c.classList.remove('selected'));
@@ -213,7 +263,12 @@ function selectPaymentMethod(method) {
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
-    updateSelectedDropPointInfo();
+    const dropPointsList = @json($dropPoints);
+    const initialId = dpInput.value;
+    const initialDp = dropPointsList.find(d => d.id == initialId) || dropPointsList[0];
+    if (initialDp) {
+        selectCustomDropPoint(initialDp);
+    }
 });
 
 // Prevent double submission
