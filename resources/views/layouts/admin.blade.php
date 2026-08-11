@@ -20,7 +20,7 @@
     </div>
     <button id="admin-sidebar-toggle" style="background: none; border: 1.5px solid rgba(255,255,255,.2); color: #fff; padding: 6px 10px; border-radius: var(--radius-md); cursor: pointer;">
         <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/>
+            <line x1="4" x2="20" y1="12" x2="20"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/>
         </svg>
     </button>
 </div>
@@ -30,7 +30,7 @@
 
 <div class="admin-layout">
 
-    <!-- SIDEBAR (CLEAN & UNCLUTTERED) -->
+    <!-- SIDEBAR (LEFT) -->
     <aside class="admin-sidebar" id="admin-sidebar">
         <div class="sidebar-logo">
             <div class="logo-icon">
@@ -73,10 +73,10 @@
         </nav>
     </aside>
 
-    <!-- MAIN CONTENT -->
-    <main class="admin-content">
+    <!-- RIGHT MAIN WRAPPER (ATTACHED HEADER + CONTENT) -->
+    <div class="admin-main-wrapper">
 
-        <!-- SAAS MINIMALIST NAVBAR (LECTOR STYLE) -->
+        <!-- SEAMLESS ATTACHED TOP NAVBAR (FLUSH WITH SIDEBAR) -->
         <header class="admin-top-nav">
             <!-- Left: Toggle Menu Button -->
             <button type="button" class="header-toggle-btn" id="desktop-sidebar-toggle" title="Toggle Sidebar">
@@ -85,7 +85,7 @@
                 </svg>
             </button>
 
-            <!-- Right: Action Circles (Cyan, Pink, Dark Avatar, Gray Action) -->
+            <!-- Right: Action Circles (Cyan, Pink, Dark Avatar, Gray Logout) -->
             <div class="header-actions-group">
                 <!-- 1. Cyan Circle: Lihat Toko Publik -->
                 <a href="{{ route('home') }}" target="_blank" class="header-circle-btn cyan" title="Buka Toko Publik (Frontend)">
@@ -115,34 +115,38 @@
             </div>
         </header>
 
-        @if(session('success') || session('error') || session('warning'))
-        <div style="margin-bottom: var(--space-md);">
-            @if(session('success'))
-            <div class="alert alert-success">
-                <span class="alert-icon"><x-icon name="check-circle" size="18" /></span>
-                <span>{{ session('success') }}</span>
-                <button class="alert-close" onclick="this.parentElement.remove()"><x-icon name="x" size="14" /></button>
+        <!-- MAIN CONTENT WITH INNER PADDING -->
+        <main class="admin-content">
+            @if(session('success') || session('error') || session('warning'))
+            <div style="margin-bottom: var(--space-md);">
+                @if(session('success'))
+                <div class="alert alert-success">
+                    <span class="alert-icon"><x-icon name="check-circle" size="18" /></span>
+                    <span>{{ session('success') }}</span>
+                    <button class="alert-close" onclick="this.parentElement.remove()"><x-icon name="x" size="14" /></button>
+                </div>
+                @endif
+                @if(session('error'))
+                <div class="alert alert-error">
+                    <span class="alert-icon"><x-icon name="x-circle" size="18" /></span>
+                    <span>{{ session('error') }}</span>
+                    <button class="alert-close" onclick="this.parentElement.remove()"><x-icon name="x" size="14" /></button>
+                </div>
+                @endif
+                @if(session('warning'))
+                <div class="alert alert-warning">
+                    <span class="alert-icon"><x-icon name="alert-triangle" size="18" /></span>
+                    <span>{{ session('warning') }}</span>
+                    <button class="alert-close" onclick="this.parentElement.remove()"><x-icon name="x" size="14" /></button>
+                </div>
+                @endif
             </div>
             @endif
-            @if(session('error'))
-            <div class="alert alert-error">
-                <span class="alert-icon"><x-icon name="x-circle" size="18" /></span>
-                <span>{{ session('error') }}</span>
-                <button class="alert-close" onclick="this.parentElement.remove()"><x-icon name="x" size="14" /></button>
-            </div>
-            @endif
-            @if(session('warning'))
-            <div class="alert alert-warning">
-                <span class="alert-icon"><x-icon name="alert-triangle" size="18" /></span>
-                <span>{{ session('warning') }}</span>
-                <button class="alert-close" onclick="this.parentElement.remove()"><x-icon name="x" size="14" /></button>
-            </div>
-            @endif
-        </div>
-        @endif
 
-        @yield('content')
-    </main>
+            @yield('content')
+        </main>
+
+    </div>
 
 </div>
 

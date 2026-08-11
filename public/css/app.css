@@ -1789,25 +1789,43 @@ textarea.form-control { resize: vertical; min-height: 105px; }
     background: #fafafa;
 }
 
-.admin-content {
-    flex: 1;
-    min-width: 0;
+.admin-layout {
+    display: flex;
+    min-height: 100vh;
     background: #f8fafc;
-    padding: 18px 22px;
+    font-size: 13.5px;
 }
 
-/* SaaS Lector Minimalist Admin Topbar */
+.admin-main-wrapper {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    background: #f8fafc;
+}
+
+/* Seamless Attached Top Navbar (Directly connected to sidebar) */
 .admin-top-nav {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 6px 14px;
+    padding: 0 24px;
     background: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 12px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.02);
-    margin-bottom: 16px;
-    height: 44px;
+    border-bottom: 1px solid #e2e8f0;
+    border-radius: 0;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+    margin: 0;
+    height: 52px;
+    position: sticky;
+    top: 0;
+    z-index: 40;
+}
+
+.admin-content {
+    flex: 1;
+    min-width: 0;
+    background: #f8fafc;
+    padding: 20px 24px;
 }
 
 .header-toggle-btn {
