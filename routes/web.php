@@ -69,7 +69,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/packages/create', [PackageController::class, 'create'])->name('packages.create');
         Route::post('/packages', [PackageController::class, 'store'])->name('packages.store');
         Route::get('/packages/{package}/edit', [PackageController::class, 'edit'])->name('packages.edit');
-        Route::patch('/packages/{package}', [PackageController::class, 'update'])->name('packages.update');
+        Route::match(['patch', 'post', 'put'], '/packages/{package}', [PackageController::class, 'update'])->name('packages.update');
         Route::delete('/packages/{package}', [PackageController::class, 'destroy'])->name('packages.destroy');
 
         Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');

@@ -58,16 +58,21 @@
                                value="{{ old('category', $package->category ?? '') }}" placeholder="Contoh: Hemat / Standar / Premium">
                     </div>
 
-                    <div class="form-group">
-                        <label class="form-label" for="image">Foto Produk</label>
-                        @if(isset($package) && $package->image)
-                        <div style="margin-bottom: 8px;">
-                            <img src="{{ asset('storage/' . $package->image) }}" alt="Foto" style="width: 100px; height: 100px; object-fit: cover; border-radius: var(--radius-md);">
+                    <div class="form-group" style="grid-column: 1 / -1;">
+                        <label class="form-label" for="images">Foto Galeri Produk (Bisa pilih banyak foto, maks 8)</label>
+                        @if(isset($package) && !empty($package->all_images))
+                        <div style="display: flex; gap: 8px; margin-bottom: 8px; flex-wrap: wrap;">
+                            @foreach($package->all_images as $idx => $img)
+                            <div style="width: 80px; height: 80px; border-radius: var(--radius-md); overflow: hidden; border: 1.5px solid #cbd5e1; position: relative;">
+                                <img src="{{ asset('storage/' . $img) }}" alt="Foto {{ $idx + 1 }}" style="width: 100%; height: 100%; object-fit: cover;">
+                                <span style="position: absolute; top: 2px; left: 2px; background: #00873d; color: #fff; font-size: 0.6rem; font-weight: 800; padding: 1px 4px; border-radius: 3px;">{{ $idx + 1 }}</span>
+                            </div>
+                            @endforeach
                         </div>
                         @endif
-                        <input type="file" name="image" id="image" class="form-control" accept="image/jpg,image/jpeg,image/png,image/webp">
-                        <div class="form-hint">Format JPG/PNG/WebP, maks 2 MB. Kosongkan jika tidak ingin mengubah foto.</div>
-                        @error('image') <div class="form-error">{{ $message }}</div> @enderror
+                        <input type="file" name="images[]" id="images" class="form-control" multiple accept="image/jpg,image/jpeg,image/png,image/webp">
+                        <div class="form-hint">Format JPG/PNG/WebP, maks 4 MB per foto. Kosongkan jika tidak ingin mengubah foto yang ada.</div>
+                        @error('images') <div class="form-error">{{ $message }}</div> @enderror
                     </div>
 
                     <div class="form-group" style="grid-column: 1 / -1;">

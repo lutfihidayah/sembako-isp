@@ -83,18 +83,26 @@ class PackageController extends Controller
 
     public function store(Request $request)
     {
-        $data = $request->validate([
+        $rules = [
             'name'        => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
             'items'       => ['nullable', 'string'],
             'price'       => ['required', 'numeric', 'min:0'],
             'stock'       => ['required', 'integer', 'min:0'],
             'category'    => ['nullable', 'string', 'max:50'],
-            'image'       => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
-            'images'      => ['nullable', 'array', 'max:8'],
-            'images.*'    => ['image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
             'is_active'   => ['boolean'],
-        ]);
+        ];
+
+        if ($request->hasFile('image')) {
+            $rules['image'] = ['file', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'];
+        }
+
+        if ($request->hasFile('images')) {
+            $rules['images'] = ['array', 'max:8'];
+            $rules['images.*'] = ['file', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'];
+        }
+
+        $data = $request->validate($rules);
 
         $data['items'] = $this->parseItems($request->input('items', ''));
         $data['is_active'] = $request->boolean('is_active', true);
@@ -104,16 +112,16 @@ class PackageController extends Controller
         // Handle multiple images
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $imgFile) {
-                $uploadedImages[] = $imgFile->store('packages', 'public');
+                if ($imgFile && $imgFile->isValid()) {
+                    $uploadedImages[] = $imgFile->store('packages', 'public');
+                }
             }
         }
 
         // Handle single image fallback
-        if ($request->hasFile('image')) {
+        if ($request->hasFile('image') && empty($uploadedImages)) {
             $singlePath = $request->file('image')->store('packages', 'public');
-            if (empty($uploadedImages)) {
-                $uploadedImages[] = $singlePath;
-            }
+            $uploadedImages[] = $singlePath;
         }
 
         if (!empty($uploadedImages)) {
@@ -133,36 +141,47 @@ class PackageController extends Controller
 
     public function update(Request $request, Package $package)
     {
-        $data = $request->validate([
+        $rules = [
             'name'        => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
             'items'       => ['nullable', 'string'],
             'price'       => ['required', 'numeric', 'min:0'],
             'stock'       => ['required', 'integer', 'min:0'],
             'category'    => ['nullable', 'string', 'max:50'],
-            'image'       => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
-            'images'      => ['nullable', 'array', 'max:8'],
-            'images.*'    => ['image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
             'is_active'   => ['boolean'],
-        ]);
+        ];
+
+        if ($request->hasFile('image')) {
+            $rules['image'] = ['file', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'];
+        }
+
+        if ($request->hasFile('images')) {
+            $rules['images'] = ['array', 'max:8'];
+            $rules['images.*'] = ['file', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'];
+        }
+
+        $data = $request->validate($rules);
 
         $data['items'] = $this->parseItems($request->input('items', ''));
         $data['is_active'] = $request->boolean('is_active');
 
         // Handle new multiple images
         if ($request->hasFile('images')) {
-            // Delete old images
-            foreach ($package->all_images as $oldImg) {
-                Storage::disk('public')->delete($oldImg);
-            }
-
             $uploadedImages = [];
             foreach ($request->file('images') as $imgFile) {
-                $uploadedImages[] = $imgFile->store('packages', 'public');
+                if ($imgFile && $imgFile->isValid()) {
+                    $uploadedImages[] = $imgFile->store('packages', 'public');
+                }
             }
 
-            $data['images'] = $uploadedImages;
-            $data['image'] = $uploadedImages[0];
+            if (!empty($uploadedImages)) {
+                // Delete old images
+                foreach ($package->all_images as $oldImg) {
+                    Storage::disk('public')->delete($oldImg);
+                }
+                $data['images'] = $uploadedImages;
+                $data['image'] = $uploadedImages[0];
+            }
         } elseif ($request->hasFile('image')) {
             if ($package->image) {
                 Storage::disk('public')->delete($package->image);
