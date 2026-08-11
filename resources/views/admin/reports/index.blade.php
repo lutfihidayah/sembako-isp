@@ -4,13 +4,6 @@
 
 @section('content')
 
-<div class="admin-topbar">
-    <div>
-        <div class="page-title">Laporan Penjualan & Pendapatan</div>
-        <div class="page-subtitle">Rangkuman transaksi dan pendapatan berdasarkan rentang tanggal dan drop point.</div>
-    </div>
-</div>
-
 <!-- Filter -->
 <div class="card mb-xl">
     <div class="card-header" style="display: flex; align-items: center; gap: 8px;">

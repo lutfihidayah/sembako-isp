@@ -4,18 +4,7 @@
 
 @section('content')
 
-<div class="admin-topbar">
-    <div>
-        <div class="page-title">Drop Point Pengambilan</div>
-        <div class="page-subtitle">Kelola lokasi titik reseller untuk pengambilan paket sembako konsumen.</div>
-    </div>
-    <a href="{{ route('admin.drop-points.create') }}" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 8px;">
-        <x-icon name="plus" size="16" />
-        <span>Tambah Drop Point</span>
-    </a>
-</div>
-
-<!-- Filter -->
+<!-- Filter & Action Bar -->
 <div class="card mb-xl" style="padding: var(--space-md) var(--space-lg);">
     <form method="GET" action="{{ route('admin.drop-points.index') }}" class="search-bar">
         <div class="search-input-wrapper" style="flex: 1;">
@@ -28,7 +17,13 @@
             <option value="0" {{ request('status') === '0' ? 'selected' : '' }}>Nonaktif</option>
         </select>
         <button type="submit" class="btn btn-primary">Filter</button>
+        @if(request()->hasAny(['search', 'status']))
         <a href="{{ route('admin.drop-points.index') }}" class="btn btn-ghost">Reset</a>
+        @endif
+        <a href="{{ route('admin.drop-points.create') }}" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 6px; margin-left: auto;">
+            <x-icon name="plus" size="16" />
+            <span>Tambah Drop Point</span>
+        </a>
     </form>
 </div>
 

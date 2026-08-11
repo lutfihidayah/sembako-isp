@@ -4,14 +4,6 @@
 
 @section('content')
 
-<div class="admin-topbar">
-    <div>
-        <div class="page-title">Kelola Pesanan Konsumen</div>
-        <div class="page-subtitle">{{ $orders->total() }} total transaksi pesanan tercatat.</div>
-    </div>
-    <a href="{{ route('admin.orders.index') }}" class="btn btn-ghost btn-sm">Reset Filter</a>
-</div>
-
 <!-- Filter -->
 <div class="card mb-xl" style="padding: var(--space-md) var(--space-lg);">
     <form method="GET" action="{{ route('admin.orders.index') }}" class="search-bar">
@@ -32,6 +24,9 @@
             @endforeach
         </select>
         <button type="submit" class="btn btn-primary">Filter</button>
+        @if(request()->hasAny(['search', 'status', 'drop_point_id']))
+        <a href="{{ route('admin.orders.index') }}" class="btn btn-ghost">Reset</a>
+        @endif
     </form>
 </div>
 

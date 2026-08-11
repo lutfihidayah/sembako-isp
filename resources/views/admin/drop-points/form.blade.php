@@ -4,11 +4,9 @@
 
 @section('content')
 
-<div class="admin-topbar">
-    <div>
-        <div class="page-title">{{ isset($dropPoint) ? 'Edit Data Drop Point' : 'Tambah Drop Point Baru' }}</div>
-    </div>
-    <a href="{{ route('admin.drop-points.index') }}" class="btn btn-ghost">← Kembali</a>
+<div style="margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; max-width: 700px;">
+    <div style="font-weight: 800; font-size: 1.1rem; color: #0f172a;">{{ isset($dropPoint) ? 'Edit Data Drop Point' : 'Tambah Drop Point Baru' }}</div>
+    <a href="{{ route('admin.drop-points.index') }}" class="btn btn-ghost btn-sm">← Kembali</a>
 </div>
 
 <div style="max-width: 700px;">

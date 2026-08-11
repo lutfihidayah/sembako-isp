@@ -4,12 +4,12 @@
 
 @section('content')
 
-<div class="admin-topbar">
+<div style="margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
     <div>
-        <div class="page-title" style="font-family: monospace;">{{ $order->order_number }}</div>
-        <div class="page-subtitle">{{ $order->created_at->format('d M Y, H:i') }} WIB · Konsumen: {{ $order->user->name }}</div>
+        <span style="font-family: monospace; font-size: 1.15rem; font-weight: 800; color: #00873d;">{{ $order->order_number }}</span>
+        <span style="font-size: 0.8rem; color: #64748b; margin-left: 8px;">{{ $order->created_at->format('d M Y, H:i') }} WIB · Konsumen: {{ $order->user->name }}</span>
     </div>
-    <a href="{{ route('admin.orders.index') }}" class="btn btn-ghost">← Kembali</a>
+    <a href="{{ route('admin.orders.index') }}" class="btn btn-ghost btn-sm">← Kembali</a>
 </div>
 
 <div class="layout-split-sidebar">
