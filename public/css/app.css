@@ -822,7 +822,7 @@ textarea.form-control { resize: vertical; min-height: 105px; }
    SPLIT-SCREEN AUTHENTICATION LAYOUT (LOGIN & REGISTER)
    ============================================================ */
 .auth-split-section {
-    min-height: 85vh;
+    min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;

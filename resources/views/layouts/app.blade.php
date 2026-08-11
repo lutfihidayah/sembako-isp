@@ -11,6 +11,7 @@
 </head>
 <body class="@auth has-bottom-nav @endauth">
 
+@if(!request()->routeIs('login', 'register', 'password.*'))
 <!-- TOP NAVBAR (E-COMMERCE STYLE WITH HEADER SEARCH) -->
 <nav class="navbar">
     <div class="container navbar-inner">
@@ -82,6 +83,7 @@
         </div>
     </div>
 </nav>
+@endif
 
 @if(session('success') || session('error') || session('warning'))
 <div class="container" style="padding-top: var(--space-md); padding-bottom: 0;">
@@ -111,12 +113,14 @@
 
 <main style="flex: 1;">@yield('content')</main>
 
+@if(!request()->routeIs('login', 'register', 'password.*'))
 <!-- FOOTER -->
 <footer class="site-footer">
     <div class="container">
         <p>© {{ date('Y') }} <strong>Sembako ISP</strong> — Layanan Paket Sembako Drop Point Reseller ISP.</p>
     </div>
 </footer>
+@endif
 
 @auth
 <!-- ============================================================
