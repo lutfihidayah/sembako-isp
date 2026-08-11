@@ -115,7 +115,7 @@
             <div class="shopee-card-header">
                 <div class="shopee-seller-name">
                     <span class="shopee-seller-badge">Drop Point</span>
-                    <span>{{ $order->dropPoint->name }}</span>
+                    <span class="shopee-seller-title">{{ $order->dropPoint->name }}</span>
                 </div>
                 <div class="shopee-status-text {{ $order->status }}">
                     {{ $order->status_label }}
