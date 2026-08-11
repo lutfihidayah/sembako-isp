@@ -10,10 +10,40 @@ use Illuminate\Support\Facades\Storage;
 
 class OrderController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $orders = Auth::user()->orders()->with(['dropPoint', 'items.package'])->paginate(10);
-        return view('orders.index', compact('orders'));
+        $user = Auth::user();
+        $statusTab = $request->get('status', 'all');
+
+        $query = $user->orders()->with(['dropPoint', 'items.package'])->orderBy('created_at', 'desc');
+
+        if ($statusTab === 'belum_bayar') {
+            $query->where('status', 'menunggu_pembayaran');
+        } elseif ($statusTab === 'dikemas') {
+            $query->whereIn('status', ['dibayar', 'sedang_dibelanjakan']);
+        } elseif ($statusTab === 'dikirim') {
+            $query->where('status', 'dikirim');
+        } elseif ($statusTab === 'siap_diambil') {
+            $query->where('status', 'siap_diambil');
+        } elseif ($statusTab === 'selesai') {
+            $query->where('status', 'selesai');
+        } elseif ($statusTab === 'dibatalkan') {
+            $query->where('status', 'dibatalkan');
+        }
+
+        $orders = $query->paginate(10)->withQueryString();
+
+        $counts = [
+            'all'          => $user->orders()->count(),
+            'belum_bayar'  => $user->orders()->where('status', 'menunggu_pembayaran')->count(),
+            'dikemas'      => $user->orders()->whereIn('status', ['dibayar', 'sedang_dibelanjakan'])->count(),
+            'dikirim'      => $user->orders()->where('status', 'dikirim')->count(),
+            'siap_diambil' => $user->orders()->where('status', 'siap_diambil')->count(),
+            'selesai'      => $user->orders()->where('status', 'selesai')->count(),
+            'dibatalkan'   => $user->orders()->where('status', 'dibatalkan')->count(),
+        ];
+
+        return view('orders.index', compact('orders', 'statusTab', 'counts'));
     }
 
     public function show(Order $order)
