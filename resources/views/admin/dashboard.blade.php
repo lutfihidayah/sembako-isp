@@ -10,57 +10,69 @@
 <div class="saas-kpi-grid" style="margin-bottom: 16px;">
     <!-- Card 1: Omzet Selesai -->
     <div class="saas-kpi-card kpi-gradient-1">
-        <div>
-            <div class="saas-kpi-title">Omzet Selesai</div>
-            <div class="saas-kpi-value">Rp {{ number_format($stats['total_revenue'], 0, ',', '.') }}</div>
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div>
+                <div class="saas-kpi-title">Omzet Selesai</div>
+                <div class="saas-kpi-value">Rp {{ number_format($stats['total_revenue'], 0, ',', '.') }}</div>
+            </div>
+            <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(255,255,255,0.22); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; color: #ffffff; flex-shrink: 0;">
+                <x-icon name="wallet" size="20" />
+            </div>
         </div>
-        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.725rem; opacity: 0.9; padding-top: 6px;">
+        <div style="display: flex; align-items: center; gap: 6px; font-size: 0.725rem; opacity: 0.9; padding-top: 6px;">
+            <x-icon name="check-circle" size="13" />
             <span>{{ $stats['orders_completed'] }} pesanan selesai</span>
-            <svg width="40" height="16" viewBox="0 0 40 16" fill="none">
-                <path d="M0 14L8 10L16 12L24 6L32 9L40 2" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
-            </svg>
         </div>
     </div>
 
     <!-- Card 2: Sedang Diproses -->
     <div class="saas-kpi-card kpi-gradient-2">
-        <div>
-            <div class="saas-kpi-title">Pesanan Diproses</div>
-            <div class="saas-kpi-value">{{ number_format($stats['orders_processing']) }} Pesanan</div>
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div>
+                <div class="saas-kpi-title">Pesanan Diproses</div>
+                <div class="saas-kpi-value">{{ number_format($stats['orders_processing']) }} Pesanan</div>
+            </div>
+            <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(255,255,255,0.22); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; color: #ffffff; flex-shrink: 0;">
+                <x-icon name="truck" size="20" />
+            </div>
         </div>
-        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.725rem; opacity: 0.9; padding-top: 6px;">
+        <div style="display: flex; align-items: center; gap: 6px; font-size: 0.725rem; opacity: 0.9; padding-top: 6px;">
+            <x-icon name="package" size="13" />
             <span>Belanja, kirim & siap ambil</span>
-            <svg width="40" height="16" viewBox="0 0 40 16" fill="none">
-                <path d="M0 12L10 8L20 14L30 4L40 6" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
-            </svg>
         </div>
     </div>
 
     <!-- Card 3: Menunggu Verifikasi -->
     <div class="saas-kpi-card kpi-gradient-3">
-        <div>
-            <div class="saas-kpi-title">Menunggu Bayar</div>
-            <div class="saas-kpi-value">{{ number_format($stats['pending_payment']) }} Pesanan</div>
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div>
+                <div class="saas-kpi-title">Menunggu Bayar</div>
+                <div class="saas-kpi-value">{{ number_format($stats['pending_payment']) }} Pesanan</div>
+            </div>
+            <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(255,255,255,0.22); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; color: #ffffff; flex-shrink: 0;">
+                <x-icon name="credit-card" size="20" />
+            </div>
         </div>
-        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.725rem; opacity: 0.9; padding-top: 6px;">
-            <span>Perlu verifikasi bukti</span>
-            <svg width="40" height="16" viewBox="0 0 40 16" fill="none">
-                <path d="M0 8L10 12L20 6L30 10L40 4" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
-            </svg>
+        <div style="display: flex; align-items: center; gap: 6px; font-size: 0.725rem; opacity: 0.9; padding-top: 6px;">
+            <x-icon name="clock" size="13" />
+            <span>Perlu verifikasi bukti transfer</span>
         </div>
     </div>
 
     <!-- Card 4: Drop Point Aktif -->
     <div class="saas-kpi-card kpi-gradient-4">
-        <div>
-            <div class="saas-kpi-title">Drop Point Aktif</div>
-            <div class="saas-kpi-value">{{ $stats['active_drop_points'] }} Lokasi</div>
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div>
+                <div class="saas-kpi-title">Drop Point Aktif</div>
+                <div class="saas-kpi-value">{{ $stats['active_drop_points'] }} Lokasi</div>
+            </div>
+            <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(255,255,255,0.22); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; color: #ffffff; flex-shrink: 0;">
+                <x-icon name="map-pin" size="20" />
+            </div>
         </div>
-        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.725rem; opacity: 0.9; padding-top: 6px;">
+        <div style="display: flex; align-items: center; gap: 6px; font-size: 0.725rem; opacity: 0.9; padding-top: 6px;">
+            <x-icon name="shield-check" size="13" />
             <span>Jaringan reseller ISP</span>
-            <svg width="40" height="16" viewBox="0 0 40 16" fill="none">
-                <path d="M0 14L8 6L16 10L24 4L32 8L40 2" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
-            </svg>
         </div>
     </div>
 </div>
