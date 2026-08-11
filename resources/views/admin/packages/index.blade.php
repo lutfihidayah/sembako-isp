@@ -104,11 +104,11 @@
         <a href="{{ route('admin.packages.index') }}" class="btn btn-ghost" style="height: 38px; padding: 0 12px; font-size: 0.85rem;">Reset</a>
         @endif
 
-        <!-- Action: Tambah Paket Button -->
-        <a href="{{ route('admin.packages.create') }}" class="btn btn-primary" style="height: 38px; padding: 0 16px; display: inline-flex; align-items: center; gap: 6px; margin-left: auto; font-weight: 700; box-shadow: 0 2px 8px rgba(0,135,61,0.25);">
+        <!-- Action: Open Popup Tambah Paket Button -->
+        <button type="button" class="btn btn-primary" onclick="openCreatePackageModal()" style="height: 38px; padding: 0 16px; display: inline-flex; align-items: center; gap: 6px; margin-left: auto; font-weight: 700; box-shadow: 0 2px 8px rgba(0,135,61,0.25); cursor: pointer;">
             <x-icon name="plus" size="16" />
             <span>+ Tambah Paket Baru</span>
-        </a>
+        </button>
     </form>
 </div>
 
@@ -123,7 +123,7 @@
         </div>
         <h3 style="font-size: 1.1rem; font-weight: 700; color: #0f172a; margin-bottom: 4px;">Tidak Ada Paket Ditemukan</h3>
         <p class="text-muted" style="font-size: 0.825rem; margin-bottom: 16px;">Coba sesuaikan kata kunci pencarian atau filter yang Anda gunakan.</p>
-        <a href="{{ route('admin.packages.create') }}" class="btn btn-primary btn-sm">+ Tambah Paket Baru</a>
+        <button type="button" class="btn btn-primary btn-sm" onclick="openCreatePackageModal()">+ Tambah Paket Baru</button>
     </div>
 </div>
 @else
@@ -244,13 +244,14 @@
                     <!-- Actions -->
                     <td style="text-align: right;">
                         <div style="display: inline-flex; align-items: center; gap: 4px;">
-                            <a href="{{ route('admin.packages.edit', $pkg) }}" class="btn btn-ghost btn-sm" style="padding: 4px 8px; font-size: 0.75rem; color: #00873d; border-radius: 6px;" title="Edit Paket">
+                            <button type="button" class="btn btn-ghost btn-sm" style="padding: 4px 8px; font-size: 0.75rem; color: #00873d; border-radius: 6px; cursor: pointer;" title="Edit Paket"
+                                    onclick="openEditPackageModal({{ json_encode($pkg) }})">
                                 <x-icon name="edit" size="13" />
                                 <span>Edit</span>
-                            </a>
+                            </button>
                             <form method="POST" action="{{ route('admin.packages.destroy', $pkg) }}" style="display: inline;" onsubmit="return confirm('Apakah Anda yakin ingin menghapus paket {{ $pkg->name }}?')">
                                 @csrf @method('DELETE')
-                                <button type="submit" class="btn btn-ghost btn-sm" style="padding: 4px 6px; color: #ef4444; border-radius: 6px;" title="Hapus Paket">
+                                <button type="submit" class="btn btn-ghost btn-sm" style="padding: 4px 6px; color: #ef4444; border-radius: 6px; cursor: pointer;" title="Hapus Paket">
                                     <x-icon name="trash" size="13" />
                                 </button>
                             </form>
@@ -285,5 +286,168 @@
     @endif
 </div>
 @endif
+
+<!-- ============================================================
+     4. POPUP / MODAL CRUD PAKET SEMBAKO (CREATE & EDIT)
+     ============================================================ -->
+<div class="modal-backdrop" id="packageModal">
+    <div class="modal-dialog">
+        <form method="POST" id="packageForm" action="{{ route('admin.packages.store') }}" enctype="multipart/form-data">
+            @csrf
+            <div id="packageMethodField"></div>
+
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <div>
+                    <div class="modal-title" id="packageModalTitle">Tambah Paket Sembako Baru</div>
+                    <div class="modal-subtitle">Isi rincian data paket sembako, stok, dan harga</div>
+                </div>
+                <button type="button" class="modal-close-btn" onclick="closePackageModal()">
+                    <x-icon name="x" size="16" />
+                </button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label" for="pkg_name" style="font-size: 0.825rem;">Nama Paket Sembako <span class="required">*</span></label>
+                    <input type="text" name="name" id="pkg_name" class="form-control" required placeholder="Contoh: Paket Sembako Berkah Ramadan" style="height: 38px; font-size: 0.875rem;">
+                </div>
+
+                <div class="grid grid-2" style="gap: 12px;">
+                    <div class="form-group">
+                        <label class="form-label" for="pkg_category" style="font-size: 0.825rem;">Kategori Paket</label>
+                        <input type="text" name="category" id="pkg_category" class="form-control" placeholder="Contoh: Paket Hemat / Paket Lengkap" list="categoryPresets" style="height: 38px; font-size: 0.875rem;">
+                        <datalist id="categoryPresets">
+                            @foreach($categories as $cat)
+                            <option value="{{ $cat }}">
+                            @endforeach
+                            <option value="Paket Hemat">
+                            <option value="Paket Lengkap">
+                            <option value="Paket Keluarga">
+                            <option value="Paket Spesial">
+                        </datalist>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="pkg_price" style="font-size: 0.825rem;">Harga Jual (Rp) <span class="required">*</span></label>
+                        <input type="number" name="price" id="pkg_price" class="form-control" required min="0" step="500" placeholder="100000" style="height: 38px; font-size: 0.875rem;">
+                    </div>
+                </div>
+
+                <div class="grid grid-2" style="gap: 12px;">
+                    <div class="form-group">
+                        <label class="form-label" for="pkg_stock" style="font-size: 0.825rem;">Jumlah Stok Gudang (Unit) <span class="required">*</span></label>
+                        <input type="number" name="stock" id="pkg_stock" class="form-control" required min="0" placeholder="50" style="height: 38px; font-size: 0.875rem;">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="pkg_image" style="font-size: 0.825rem;">Foto Produk (Opsional)</label>
+                        <input type="file" name="image" id="pkg_image" class="form-control" accept="image/jpeg,image/png,image/webp" style="padding: 5px; font-size: 0.8rem; height: 38px;">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="pkg_items" style="font-size: 0.825rem;">
+                        Komposisi Isi Sembako <span style="font-size: 0.725rem; font-weight: normal; color: #64748b;">(Tulis satu barang per baris)</span>
+                    </label>
+                    <textarea name="items" id="pkg_items" class="form-control" rows="3" placeholder="Beras Premium 5 Kg&#10;Minyak Goreng 2 Liter&#10;Gula Pasir 1 Kg&#10;Teh Celup 1 Kotak" style="font-size: 0.85rem; font-family: inherit;"></textarea>
+                </div>
+
+                <div class="form-group mb-sm">
+                    <label class="form-label" for="pkg_description" style="font-size: 0.825rem;">Keterangan Singkat</label>
+                    <input type="text" name="description" id="pkg_description" class="form-control" placeholder="Cocok untuk kebutuhan konsumsi harian keluarga 4 orang" style="height: 38px; font-size: 0.85rem;">
+                </div>
+
+                <div class="form-check" style="margin-top: 10px;">
+                    <input type="checkbox" name="is_active" id="pkg_is_active" value="1" checked>
+                    <label class="form-check-label" for="pkg_is_active" style="font-size: 0.825rem; font-weight: 600; color: #0f172a;">
+                        Aktifkan paket sembako untuk dipesan langsung oleh konsumen
+                    </label>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-ghost" onclick="closePackageModal()" style="height: 38px; font-size: 0.85rem;">Batal</button>
+                <button type="submit" class="btn btn-primary" id="packageSubmitBtn" style="height: 38px; padding: 0 18px; font-size: 0.85rem; font-weight: 700; box-shadow: 0 2px 8px rgba(0,135,61,0.25);">
+                    Simpan Paket
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@push('scripts')
+<script>
+const packageModal = document.getElementById('packageModal');
+const packageForm = document.getElementById('packageForm');
+const packageMethodField = document.getElementById('packageMethodField');
+const packageModalTitle = document.getElementById('packageModalTitle');
+const packageSubmitBtn = document.getElementById('packageSubmitBtn');
+
+function openCreatePackageModal() {
+    packageForm.action = "{{ route('admin.packages.store') }}";
+    packageMethodField.innerHTML = "";
+    packageModalTitle.innerText = "Tambah Paket Sembako Baru";
+    packageSubmitBtn.innerText = "Simpan Paket Baru";
+    
+    // Reset inputs
+    document.getElementById('pkg_name').value = "";
+    document.getElementById('pkg_category').value = "";
+    document.getElementById('pkg_price').value = "";
+    document.getElementById('pkg_stock').value = "50";
+    document.getElementById('pkg_items').value = "";
+    document.getElementById('pkg_description').value = "";
+    document.getElementById('pkg_image').value = "";
+    document.getElementById('pkg_is_active').checked = true;
+
+    packageModal.classList.add('open');
+}
+
+function openEditPackageModal(pkg) {
+    packageForm.action = "/admin/packages/" + pkg.id;
+    packageMethodField.innerHTML = '<input type="hidden" name="_method" value="PATCH">';
+    packageModalTitle.innerText = "Edit Paket Sembako: " + pkg.name;
+    packageSubmitBtn.innerText = "Simpan Perubahan";
+
+    // Fill inputs
+    document.getElementById('pkg_name').value = pkg.name || "";
+    document.getElementById('pkg_category').value = pkg.category || "";
+    document.getElementById('pkg_price').value = pkg.price || "";
+    document.getElementById('pkg_stock').value = pkg.stock !== undefined ? pkg.stock : "0";
+    document.getElementById('pkg_description').value = pkg.description || "";
+    document.getElementById('pkg_image').value = "";
+    document.getElementById('pkg_is_active').checked = Boolean(pkg.is_active);
+
+    // Items array to newline string
+    if (Array.isArray(pkg.items)) {
+        document.getElementById('pkg_items').value = pkg.items.join('\n');
+    } else {
+        document.getElementById('pkg_items').value = pkg.items || "";
+    }
+
+    packageModal.classList.add('open');
+}
+
+function closePackageModal() {
+    packageModal.classList.remove('open');
+}
+
+// Close on backdrop click
+packageModal.addEventListener('click', function(e) {
+    if (e.target === packageModal) {
+        closePackageModal();
+    }
+});
+
+// Close on Escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && packageModal.classList.contains('open')) {
+        closePackageModal();
+    }
+});
+</script>
+@endpush
 
 @endsection
