@@ -10,27 +10,12 @@
 </head>
 <body>
 
-<!-- Admin Mobile Top Header Bar -->
-<div class="admin-mobile-header">
-    <div style="display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 1.1rem;">
-        <div style="width: 32px; height: 32px; background: var(--primary-500); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center;">
-            <x-icon name="logo" size="18" />
-        </div>
-        <span>Admin ISP</span>
-    </div>
-    <button id="admin-sidebar-toggle" style="background: none; border: 1.5px solid rgba(255,255,255,.2); color: #fff; padding: 6px 10px; border-radius: var(--radius-md); cursor: pointer;">
-        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="4" x2="20" y1="12" x2="20"/><line x1="4" x2="20" y1="6" x2="6"/><line x1="4" x2="20" y1="18" x2="18"/>
-        </svg>
-    </button>
-</div>
-
 <!-- Mobile Drawer Backdrop -->
 <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
 
 <div class="admin-layout">
 
-    <!-- SIDEBAR (LEFT) -->
+    <!-- SIDEBAR (DRAWER ON MOBILE, FIXED ON DESKTOP) -->
     <aside class="admin-sidebar" id="admin-sidebar">
         <div class="sidebar-logo">
             <div class="logo-icon">
@@ -76,11 +61,11 @@
     <!-- RIGHT MAIN WRAPPER (ATTACHED HEADER + CONTENT) -->
     <div class="admin-main-wrapper">
 
-        <!-- SEAMLESS ATTACHED TOP NAVBAR (FLUSH WITH SIDEBAR) -->
+        <!-- UNIFIED TOP NAVBAR (SINGLE HEADER) -->
         <header class="admin-top-nav">
             <!-- Left: Toggle Menu Button -->
-            <button type="button" class="header-toggle-btn" id="desktop-sidebar-toggle" title="Toggle Sidebar">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <button type="button" class="header-toggle-btn" id="sidebar-toggle-btn" title="Toggle Menu Sidebar">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/>
                 </svg>
             </button>
@@ -155,20 +140,58 @@
 
 </div>
 
+<!-- ============================================================
+     ADMIN MOBILE BOTTOM APP BAR NAVIGATION (PIXEL-PERFECT MATCH)
+     ============================================================ -->
+<div class="mobile-bottom-nav">
+    <!-- 1. Dashboard -->
+    <a href="{{ route('admin.dashboard') }}" class="bottom-nav-item {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
+        <div class="nav-icon"><x-icon name="dashboard" size="20" /></div>
+        <span>Dashboard</span>
+    </a>
+
+    <!-- 2. Pesanan -->
+    <a href="{{ route('admin.orders.index') }}" class="bottom-nav-item {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}">
+        <div class="nav-icon"><x-icon name="receipt" size="20" /></div>
+        <span>Pesanan</span>
+    </a>
+
+    <!-- 3. Floating Center Action Button (Kelola Paket Sembako) -->
+    <a href="{{ route('admin.packages.index') }}" class="bottom-nav-center {{ request()->routeIs('admin.packages.*') ? 'active' : '' }}" title="Kelola Paket Sembako">
+        <x-icon name="package" size="22" />
+        @php
+            $pendingOrderCount = \App\Models\Order::where('status', 'menunggu_pembayaran')->whereNotNull('payment_proof')->count();
+        @endphp
+        @if($pendingOrderCount > 0)
+        <span class="cart-badge">{{ $pendingOrderCount > 99 ? '99+' : $pendingOrderCount }}</span>
+        @endif
+    </a>
+
+    <!-- 4. Drop Point -->
+    <a href="{{ route('admin.drop-points.index') }}" class="bottom-nav-item {{ request()->routeIs('admin.drop-points.*') ? 'active' : '' }}">
+        <div class="nav-icon"><x-icon name="map-pin" size="20" /></div>
+        <span>Drop Point</span>
+    </a>
+
+    <!-- 5. Laporan -->
+    <a href="{{ route('admin.reports.index') }}" class="bottom-nav-item {{ request()->routeIs('admin.reports.*') ? 'active' : '' }}">
+        <div class="nav-icon"><x-icon name="bar-chart" size="20" /></div>
+        <span>Laporan</span>
+    </a>
+</div>
+
 <script>
-// Sidebar Toggle Logic
-const sidebarToggle = document.getElementById('admin-sidebar-toggle');
-const desktopSidebarToggle = document.getElementById('desktop-sidebar-toggle');
+// Sidebar Toggle Logic for Mobile & Desktop
+const sidebarToggleBtn = document.getElementById('sidebar-toggle-btn');
 const adminSidebar = document.getElementById('admin-sidebar');
 const sidebarBackdrop = document.getElementById('sidebar-backdrop');
 
 function toggleSidebar() {
-    adminSidebar.classList.toggle('open');
-    if (sidebarBackdrop) sidebarBackdrop.classList.toggle('open');
+    adminSidebar?.classList.toggle('open');
+    sidebarBackdrop?.classList.toggle('open');
 }
 
-sidebarToggle?.addEventListener('click', toggleSidebar);
-desktopSidebarToggle?.addEventListener('click', toggleSidebar);
+sidebarToggleBtn?.addEventListener('click', toggleSidebar);
 sidebarBackdrop?.addEventListener('click', toggleSidebar);
 
 // Admin Profile Dropdown Logic

@@ -1718,6 +1718,40 @@ textarea.form-control { resize: vertical; min-height: 105px; }
     box-shadow: 2px 0 10px rgba(0,0,0,0.02);
 }
 
+.sidebar-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(15, 23, 42, 0.5);
+    backdrop-filter: blur(2px);
+    z-index: 140;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+}
+
+.sidebar-backdrop.open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+@media (max-width: 1024px) {
+    .admin-sidebar {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        transform: translateX(-100%);
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    .admin-sidebar.open {
+        transform: translateX(0);
+    }
+}
+
 .sidebar-logo {
     padding: 16px 18px;
     border-bottom: 1px solid #f1f5f9;
