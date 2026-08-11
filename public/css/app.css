@@ -1827,7 +1827,14 @@ textarea.form-control { resize: vertical; min-height: 105px; }
     display: flex;
     min-height: 100vh;
     background: #f8fafc;
-    font-size: 13.5px;
+    font-size: 13px;
+    zoom: 0.82;
+}
+
+@media (max-width: 768px) {
+    .admin-layout {
+        zoom: 1;
+    }
 }
 
 .admin-main-wrapper {
