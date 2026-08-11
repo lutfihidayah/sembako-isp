@@ -14,17 +14,66 @@ class PackageController extends Controller
         $query = Package::query();
 
         if ($search = $request->get('search')) {
-            $query->where('name', 'like', "%{$search}%");
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%")
+                  ->orWhere('category', 'like', "%{$search}%");
+            });
         }
 
         if ($category = $request->get('category')) {
             $query->where('category', $category);
         }
 
-        $packages = $query->orderBy('created_at', 'desc')->paginate(12);
+        if ($status = $request->get('status')) {
+            if ($status === 'active') {
+                $query->where('is_active', true);
+            } elseif ($status === 'inactive') {
+                $query->where('is_active', false);
+            } elseif ($status === 'low_stock') {
+                $query->where('stock', '>', 0)->where('stock', '<=', 5);
+            } elseif ($status === 'out_of_stock') {
+                $query->where('stock', 0);
+            }
+        }
+
+        $sort = $request->get('sort', 'newest');
+        switch ($sort) {
+            case 'price_asc':
+                $query->orderBy('price', 'asc');
+                break;
+            case 'price_desc':
+                $query->orderBy('price', 'desc');
+                break;
+            case 'stock_asc':
+                $query->orderBy('stock', 'asc');
+                break;
+            case 'stock_desc':
+                $query->orderBy('stock', 'desc');
+                break;
+            case 'name_asc':
+                $query->orderBy('name', 'asc');
+                break;
+            case 'newest':
+            default:
+                $query->orderBy('created_at', 'desc');
+                break;
+        }
+
+        $perPage = in_array((int)$request->get('per_page'), [10, 15, 25, 50, 100]) ? (int)$request->get('per_page') : 15;
+        $packages = $query->paginate($perPage)->withQueryString();
+
         $categories = Package::distinct()->pluck('category')->filter()->sort()->values();
 
-        return view('admin.packages.index', compact('packages', 'categories'));
+        $stats = [
+            'total'     => Package::count(),
+            'active'    => Package::where('is_active', true)->count(),
+            'inactive'  => Package::where('is_active', false)->count(),
+            'low_stock' => Package::where('stock', '<=', 5)->count(),
+            'sum_stock' => Package::sum('stock'),
+        ];
+
+        return view('admin.packages.index', compact('packages', 'categories', 'stats'));
     }
 
     public function create()
