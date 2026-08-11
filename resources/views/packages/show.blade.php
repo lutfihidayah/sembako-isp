@@ -14,13 +14,21 @@
 
     <div class="layout-split-equal">
 
-        <!-- Left: Image -->
+        <!-- Left: Image with Fullscreen Lightbox -->
         <div>
             @if($package->image)
-            <img src="{{ asset('storage/' . $package->image) }}" alt="{{ $package->name }}"
-                 style="width: 100%; max-height: 380px; object-fit: cover; border-radius: var(--radius-lg); border: 1px solid var(--gray-200); box-shadow: var(--shadow-sm);">
+            <div style="position: relative; overflow: hidden; border-radius: var(--radius-lg); border: 1px solid var(--gray-200); box-shadow: var(--shadow-sm); cursor: pointer;"
+                 onclick="openImageLightbox('{{ asset('storage/' . $package->image) }}')"
+                 title="Klik untuk memperbesar foto">
+                <img src="{{ asset('storage/' . $package->image) }}" alt="{{ $package->name }}"
+                     style="width: 100%; max-height: 380px; object-fit: cover; display: block; transition: transform 0.2s ease;">
+                <div style="position: absolute; bottom: 8px; right: 8px; background: rgba(15,23,42,0.7); color: #fff; font-size: 0.7rem; font-weight: 600; padding: 3px 8px; border-radius: var(--radius-full); display: flex; align-items: center; gap: 4px;">
+                    <x-icon name="search" size="12" />
+                    <span>Perbesar Foto</span>
+                </div>
+            </div>
             @else
-            <div style="width: 100%; height: 240px; background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-radius: var(--radius-lg); border: 1px solid var(--gray-200); display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--primary-700); gap: 10px;">
+            <div style="width: 100%; height: 260px; background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-radius: var(--radius-lg); border: 1px solid var(--gray-200); display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--primary-700); gap: 10px;">
                 <div style="width: 60px; height: 60px; background: rgba(255,255,255,0.8); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center;">
                     <x-icon name="package" size="32" />
                 </div>
@@ -126,6 +134,21 @@
 </div>
 </div>
 
+<!-- Image Lightbox Modal -->
+<div class="modal-backdrop" id="productLightbox" style="z-index: 9999;">
+    <div class="modal-dialog" style="max-width: 540px; background: #ffffff; border-radius: 16px; overflow: hidden; padding: 0;">
+        <div class="modal-header" style="padding: 12px 18px; border-bottom: 1px solid #f1f5f9;">
+            <div style="font-weight: 700; font-size: 0.95rem; color: #0f172a;">{{ $package->name }}</div>
+            <button type="button" class="modal-close-btn" onclick="closeImageLightbox()">
+                <x-icon name="x" size="16" />
+            </button>
+        </div>
+        <div style="padding: 16px; background: #f8fafc; text-align: center;">
+            <img id="lightboxImg" src="" alt="{{ $package->name }}" style="max-width: 100%; max-height: 480px; object-fit: contain; border-radius: 10px; box-shadow: 0 4px 14px rgba(0,0,0,0.08);">
+        </div>
+    </div>
+</div>
+
 @push('scripts')
 <script>
 function changeQty(delta) {
@@ -136,6 +159,26 @@ function changeQty(delta) {
     if (val > max) val = max;
     input.value = val;
 }
+
+const productLightbox = document.getElementById('productLightbox');
+const lightboxImg = document.getElementById('lightboxImg');
+
+function openImageLightbox(url) {
+    lightboxImg.src = url;
+    productLightbox.classList.add('open');
+}
+
+function closeImageLightbox() {
+    productLightbox.classList.remove('open');
+}
+
+productLightbox.addEventListener('click', function(e) {
+    if (e.target === productLightbox) closeImageLightbox();
+});
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeImageLightbox();
+});
 </script>
 @endpush
 

@@ -153,11 +153,14 @@
                     <!-- Product Image & Name -->
                     <td>
                         <div style="display: flex; align-items: center; gap: 12px;">
-                            <div style="width: 44px; height: 44px; border-radius: 8px; overflow: hidden; background: #f1f5f9; border: 1px solid #e2e8f0; flex-shrink: 0; display: flex; align-items: center; justify-content: center;">
+                            <!-- Clickable Image Thumbnail to View Large Photo -->
+                            <div style="width: 46px; height: 46px; border-radius: 8px; overflow: hidden; background: #f1f5f9; border: 1px solid #e2e8f0; flex-shrink: 0; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.15s ease;"
+                                 title="Klik untuk melihat foto"
+                                 onclick="viewImagePreview('{{ $pkg->image ? asset('storage/' . $pkg->image) : '' }}', '{{ $pkg->name }}')">
                                 @if($pkg->image)
                                 <img src="{{ asset('storage/' . $pkg->image) }}" alt="{{ $pkg->name }}" style="width: 100%; height: 100%; object-fit: cover;">
                                 @else
-                                <span style="color: #94a3b8;"><x-icon name="package" size="20" /></span>
+                                <span style="color: #94a3b8;"><x-icon name="package" size="22" /></span>
                                 @endif
                             </div>
                             <div style="min-width: 0;">
@@ -300,7 +303,7 @@
             <div class="modal-header">
                 <div>
                     <div class="modal-title" id="packageModalTitle">Tambah Paket Sembako Baru</div>
-                    <div class="modal-subtitle">Isi rincian data paket sembako, stok, dan harga</div>
+                    <div class="modal-subtitle">Isi rincian data paket sembako, foto, stok, dan harga</div>
                 </div>
                 <button type="button" class="modal-close-btn" onclick="closePackageModal()">
                     <x-icon name="x" size="16" />
@@ -341,9 +344,16 @@
                         <input type="number" name="stock" id="pkg_stock" class="form-control" required min="0" placeholder="50" style="height: 38px; font-size: 0.875rem;">
                     </div>
 
+                    <!-- Photo Upload with Live Thumbnail Preview -->
                     <div class="form-group">
-                        <label class="form-label" for="pkg_image" style="font-size: 0.825rem;">Foto Produk (Opsional)</label>
-                        <input type="file" name="image" id="pkg_image" class="form-control" accept="image/jpeg,image/png,image/webp" style="padding: 5px; font-size: 0.8rem; height: 38px;">
+                        <label class="form-label" style="font-size: 0.825rem;">Foto Produk Sembako</label>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div id="pkg_preview_box" style="width: 44px; height: 44px; border-radius: 8px; border: 1.5px dashed #cbd5e1; background: #f8fafc; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0;">
+                                <img id="pkg_preview_img" src="" alt="Preview" style="display: none; width: 100%; height: 100%; object-fit: cover;">
+                                <span id="pkg_preview_icon" style="color: #94a3b8;"><x-icon name="camera" size="18" /></span>
+                            </div>
+                            <input type="file" name="image" id="pkg_image" class="form-control" accept="image/jpeg,image/png,image/webp" style="padding: 5px; font-size: 0.8rem; height: 38px; flex: 1;" onchange="previewPackageImage(this)">
+                        </div>
                     </div>
                 </div>
 
@@ -378,6 +388,23 @@
     </div>
 </div>
 
+<!-- ============================================================
+     5. LIGHTBOX / PHOTO VIEWER MODAL
+     ============================================================ -->
+<div class="modal-backdrop" id="imageViewerModal">
+    <div class="modal-dialog" style="max-width: 480px; padding: 0; background: #ffffff; border-radius: 16px; overflow: hidden;">
+        <div class="modal-header" style="border-bottom: 1px solid #f1f5f9; padding: 14px 18px;">
+            <div class="modal-title" id="imageViewerTitle" style="font-size: 0.95rem;">Foto Produk</div>
+            <button type="button" class="modal-close-btn" onclick="closeImageViewer()">
+                <x-icon name="x" size="16" />
+            </button>
+        </div>
+        <div style="padding: 16px; text-align: center; background: #f8fafc;">
+            <img id="imageViewerImg" src="" alt="Foto Produk" style="max-width: 100%; max-height: 380px; object-fit: contain; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+        </div>
+    </div>
+</div>
+
 @push('scripts')
 <script>
 const packageModal = document.getElementById('packageModal');
@@ -385,6 +412,20 @@ const packageForm = document.getElementById('packageForm');
 const packageMethodField = document.getElementById('packageMethodField');
 const packageModalTitle = document.getElementById('packageModalTitle');
 const packageSubmitBtn = document.getElementById('packageSubmitBtn');
+const previewImg = document.getElementById('pkg_preview_img');
+const previewIcon = document.getElementById('pkg_preview_icon');
+
+function previewPackageImage(input) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            previewImg.src = e.target.result;
+            previewImg.style.display = 'block';
+            previewIcon.style.display = 'none';
+        }
+        reader.readAsDataURL(input.files[0]);
+    }
+}
 
 function openCreatePackageModal() {
     packageForm.action = "{{ route('admin.packages.store') }}";
@@ -401,6 +442,11 @@ function openCreatePackageModal() {
     document.getElementById('pkg_description').value = "";
     document.getElementById('pkg_image').value = "";
     document.getElementById('pkg_is_active').checked = true;
+
+    // Reset preview
+    previewImg.src = "";
+    previewImg.style.display = 'none';
+    previewIcon.style.display = 'block';
 
     packageModal.classList.add('open');
 }
@@ -420,6 +466,17 @@ function openEditPackageModal(pkg) {
     document.getElementById('pkg_image').value = "";
     document.getElementById('pkg_is_active').checked = Boolean(pkg.is_active);
 
+    // Image preview
+    if (pkg.image) {
+        previewImg.src = "/storage/" + pkg.image;
+        previewImg.style.display = 'block';
+        previewIcon.style.display = 'none';
+    } else {
+        previewImg.src = "";
+        previewImg.style.display = 'none';
+        previewIcon.style.display = 'block';
+    }
+
     // Items array to newline string
     if (Array.isArray(pkg.items)) {
         document.getElementById('pkg_items').value = pkg.items.join('\n');
@@ -434,17 +491,35 @@ function closePackageModal() {
     packageModal.classList.remove('open');
 }
 
+// Lightbox Viewer
+const imageViewerModal = document.getElementById('imageViewerModal');
+const imageViewerImg = document.getElementById('imageViewerImg');
+const imageViewerTitle = document.getElementById('imageViewerTitle');
+
+function viewImagePreview(url, title) {
+    if (!url) return;
+    imageViewerImg.src = url;
+    imageViewerTitle.innerText = title || "Foto Produk";
+    imageViewerModal.classList.add('open');
+}
+
+function closeImageViewer() {
+    imageViewerModal.classList.remove('open');
+}
+
 // Close on backdrop click
 packageModal.addEventListener('click', function(e) {
-    if (e.target === packageModal) {
-        closePackageModal();
-    }
+    if (e.target === packageModal) closePackageModal();
+});
+imageViewerModal.addEventListener('click', function(e) {
+    if (e.target === imageViewerModal) closeImageViewer();
 });
 
 // Close on Escape key
 document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape' && packageModal.classList.contains('open')) {
+    if (e.key === 'Escape') {
         closePackageModal();
+        closeImageViewer();
     }
 });
 </script>
