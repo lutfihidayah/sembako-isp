@@ -256,7 +256,7 @@
                     <td style="text-align: right;">
                         <div style="display: inline-flex; align-items: center; gap: 4px;">
                             <button type="button" class="btn btn-ghost btn-sm" style="padding: 4px 8px; font-size: 0.75rem; color: #00873d; border-radius: 6px; cursor: pointer;" title="Edit Paket"
-                                    onclick="openEditPackageModal({{ json_encode($pkg) }}, {{ json_encode($imgList) }})">
+                                    onclick="openEditPackageModal({{ json_encode($pkg) }}, {{ json_encode($imgList) }}, {{ json_encode($pkg->all_images) }})">
                                 <x-icon name="edit" size="13" />
                                 <span>Edit</span>
                             </button>
@@ -426,26 +426,93 @@ const packageMethodField = document.getElementById('packageMethodField');
 const packageModalTitle = document.getElementById('packageModalTitle');
 const packageSubmitBtn = document.getElementById('packageSubmitBtn');
 const previewContainer = document.getElementById('pkg_multi_preview_container');
+const pkgImagesInput = document.getElementById('pkg_images');
+
+let stagedFiles = [];
+let activePackageId = null;
 
 function previewMultiPackageImages(input) {
-    previewContainer.innerHTML = "";
     if (input.files && input.files.length > 0) {
-        for (let i = 0; i < input.files.length; i++) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const imgWrap = document.createElement('div');
-                imgWrap.style.cssText = "width: 52px; height: 52px; border-radius: 8px; overflow: hidden; border: 1.5px solid #00873d; position: relative; background: #fff;";
-                imgWrap.innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;"><span style="position:absolute;top:1px;left:1px;background:#00873d;color:#fff;font-size:0.55rem;padding:0 3px;border-radius:2px;font-weight:800;">${i+1}</span>`;
-                previewContainer.appendChild(imgWrap);
-            }
-            reader.readAsDataURL(input.files[i]);
-        }
-    } else {
+        stagedFiles = Array.from(input.files);
+        renderStagedFiles();
+    }
+}
+
+function renderStagedFiles() {
+    // Clear staged chips
+    document.querySelectorAll('.staged-chip').forEach(el => el.remove());
+    const placeholder = document.getElementById('pkg_multi_placeholder');
+    if (placeholder && stagedFiles.length > 0) placeholder.remove();
+
+    stagedFiles.forEach((file, index) => {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const wrap = document.createElement('div');
+            wrap.className = 'staged-chip';
+            wrap.style.cssText = "width: 56px; height: 56px; border-radius: 8px; position: relative; background: #fff; flex-shrink: 0; margin: 4px;";
+            wrap.innerHTML = `
+                <img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;border-radius:8px;border:1.5px solid #00873d;">
+                <span style="position:absolute;top:2px;left:2px;background:#00873d;color:#fff;font-size:0.55rem;padding:0 3px;border-radius:2px;font-weight:800;">${index+1}</span>
+                <button type="button" title="Hapus foto ini" onclick="removeStagedPhoto(${index})" style="position:absolute;top:-6px;right:-6px;width:20px;height:20px;border-radius:50%;background:#ef4444;color:#fff;border:1.5px solid #fff;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px;font-weight:bold;box-shadow:0 1px 4px rgba(0,0,0,0.25);z-index:5;">×</button>
+            `;
+            previewContainer.appendChild(wrap);
+        };
+        reader.readAsDataURL(file);
+    });
+
+    // Sync to file input via DataTransfer
+    const dt = new DataTransfer();
+    stagedFiles.forEach(f => dt.items.add(f));
+    pkgImagesInput.files = dt.files;
+}
+
+function removeStagedPhoto(index) {
+    stagedFiles.splice(index, 1);
+    renderStagedFiles();
+    if (stagedFiles.length === 0 && previewContainer.children.length === 0) {
         previewContainer.innerHTML = '<span id="pkg_multi_placeholder" style="font-size: 0.75rem; color: #94a3b8; padding-left: 4px;">Pilih satu atau beberapa foto untuk melihat pratinjau...</span>';
     }
 }
 
+function deleteExistingPackagePhoto(packageId, rawPath, element) {
+    if (!confirm("Apakah Anda yakin ingin menghapus foto ini dari katalog paket?")) {
+        return;
+    }
+
+    fetch(`/admin/packages/${packageId}/images`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+            'Accept': 'application/json'
+        },
+        body: JSON.stringify({ path: rawPath })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            element.style.opacity = '0';
+            element.style.transform = 'scale(0.8)';
+            element.style.transition = 'all 0.2s ease';
+            setTimeout(() => {
+                element.remove();
+                if (previewContainer.children.length === 0) {
+                    previewContainer.innerHTML = '<span id="pkg_multi_placeholder" style="font-size: 0.75rem; color: #94a3b8; padding-left: 4px;">Belum ada foto yang diunggah.</span>';
+                }
+            }, 200);
+        } else {
+            alert("Gagal menghapus foto.");
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert("Terjadi kesalahan koneksi saat menghapus foto.");
+    });
+}
+
 function openCreatePackageModal() {
+    activePackageId = null;
+    stagedFiles = [];
     packageForm.action = "{{ route('admin.packages.store') }}";
     packageMethodField.innerHTML = "";
     packageModalTitle.innerText = "Tambah Paket Sembako Baru";
@@ -466,7 +533,9 @@ function openCreatePackageModal() {
     packageModal.classList.add('open');
 }
 
-function openEditPackageModal(pkg, existingImageUrls) {
+function openEditPackageModal(pkg, existingImageUrls, existingRawPaths) {
+    activePackageId = pkg.id;
+    stagedFiles = [];
     packageForm.action = "/admin/packages/" + pkg.id;
     packageMethodField.innerHTML = '<input type="hidden" name="_method" value="PATCH">';
     packageModalTitle.innerText = "Edit Paket Sembako: " + pkg.name;
@@ -481,14 +550,20 @@ function openEditPackageModal(pkg, existingImageUrls) {
     document.getElementById('pkg_images').value = "";
     document.getElementById('pkg_is_active').checked = Boolean(pkg.is_active);
 
-    // Existing images preview
+    // Existing images preview with individual delete buttons
     previewContainer.innerHTML = "";
     if (existingImageUrls && existingImageUrls.length > 0) {
         existingImageUrls.forEach((url, i) => {
-            const imgWrap = document.createElement('div');
-            imgWrap.style.cssText = "width: 52px; height: 52px; border-radius: 8px; overflow: hidden; border: 1.5px solid #cbd5e1; position: relative; background: #fff;";
-            imgWrap.innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover;"><span style="position:absolute;top:1px;left:1px;background:#64748b;color:#fff;font-size:0.55rem;padding:0 3px;border-radius:2px;font-weight:800;">${i+1}</span>`;
-            previewContainer.appendChild(imgWrap);
+            const rawPath = existingRawPaths && existingRawPaths[i] ? existingRawPaths[i] : "";
+            const wrap = document.createElement('div');
+            wrap.className = 'existing-chip';
+            wrap.style.cssText = "width: 56px; height: 56px; border-radius: 8px; position: relative; background: #fff; flex-shrink: 0; margin: 4px;";
+            wrap.innerHTML = `
+                <img src="${url}" style="width:100%;height:100%;object-fit:cover;border-radius:8px;border:1.5px solid #cbd5e1;">
+                <span style="position:absolute;top:2px;left:2px;background:#64748b;color:#fff;font-size:0.55rem;padding:0 3px;border-radius:2px;font-weight:800;">${i+1}</span>
+                <button type="button" title="Hapus foto ini dari server" onclick="deleteExistingPackagePhoto(${pkg.id}, '${rawPath}', this.parentElement)" style="position:absolute;top:-6px;right:-6px;width:20px;height:20px;border-radius:50%;background:#ef4444;color:#fff;border:1.5px solid #fff;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px;font-weight:bold;box-shadow:0 1px 4px rgba(0,0,0,0.25);z-index:5;">×</button>
+            `;
+            previewContainer.appendChild(wrap);
         });
     } else {
         previewContainer.innerHTML = '<span id="pkg_multi_placeholder" style="font-size: 0.75rem; color: #94a3b8; padding-left: 4px;">Belum ada foto yang diunggah. Pilih file untuk menambahkan foto baru.</span>';

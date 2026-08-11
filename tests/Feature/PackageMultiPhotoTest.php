@@ -114,4 +114,39 @@ class PackageMultiPhotoTest extends TestCase
         $response->assertSee('packages/side.jpg');
         $response->assertSee('packages/detail.jpg');
     }
+
+    public function test_admin_can_delete_individual_package_image()
+    {
+        $admin = Admin::create([
+            'name'     => 'Admin Test',
+            'email'    => 'admin_test3@isp.local',
+            'password' => bcrypt('secret123'),
+        ]);
+
+        Storage::disk('public')->put('packages/keep.jpg', 'fake content');
+        Storage::disk('public')->put('packages/delete_me.jpg', 'fake content');
+
+        $package = Package::create([
+            'name'      => 'Paket Test Hapus Foto',
+            'price'     => 100000,
+            'stock'     => 10,
+            'is_active' => true,
+            'image'     => 'packages/keep.jpg',
+            'images'    => ['packages/keep.jpg', 'packages/delete_me.jpg'],
+            'items'     => ['Beras 5kg'],
+        ]);
+
+        $response = $this->actingAs($admin, 'admin')->deleteJson(route('admin.packages.delete-image', $package), [
+            'path' => 'packages/delete_me.jpg',
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJson(['success' => true]);
+
+        $package->refresh();
+        $this->assertCount(1, $package->images);
+        $this->assertEquals(['packages/keep.jpg'], $package->images);
+        Storage::disk('public')->assertMissing('packages/delete_me.jpg');
+        Storage::disk('public')->assertExists('packages/keep.jpg');
+    }
 }

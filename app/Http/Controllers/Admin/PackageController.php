@@ -206,6 +206,32 @@ class PackageController extends Controller
             ->with('success', 'Paket sembako berhasil dihapus.');
     }
 
+    public function deleteImage(Request $request, Package $package)
+    {
+        $path = $request->input('path');
+        if ($path) {
+            Storage::disk('public')->delete($path);
+
+            $allImages = $package->all_images;
+            $newImages = array_values(array_filter($allImages, fn($p) => $p !== $path));
+
+            $package->images = $newImages;
+            $package->image = $newImages[0] ?? null;
+            $package->save();
+
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Foto produk berhasil dihapus.',
+                    'remaining_images' => array_map(fn($p) => asset('storage/' . $p), $newImages),
+                    'remaining_paths' => $newImages,
+                ]);
+            }
+        }
+
+        return back()->with('success', 'Foto produk berhasil dihapus.');
+    }
+
     private function parseItems(string $raw): array
     {
         return array_filter(

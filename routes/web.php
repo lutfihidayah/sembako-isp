@@ -70,6 +70,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/packages', [PackageController::class, 'store'])->name('packages.store');
         Route::get('/packages/{package}/edit', [PackageController::class, 'edit'])->name('packages.edit');
         Route::match(['patch', 'post', 'put'], '/packages/{package}', [PackageController::class, 'update'])->name('packages.update');
+        Route::delete('/packages/{package}/images', [PackageController::class, 'deleteImage'])->name('packages.delete-image');
         Route::delete('/packages/{package}', [PackageController::class, 'destroy'])->name('packages.destroy');
 
         Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');
