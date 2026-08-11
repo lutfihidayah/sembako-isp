@@ -30,7 +30,7 @@
 
 <div class="admin-layout">
 
-    <!-- SIDEBAR -->
+    <!-- SIDEBAR (CLEAN & UNCLUTTERED) -->
     <aside class="admin-sidebar" id="admin-sidebar">
         <div class="sidebar-logo">
             <div class="logo-icon">
@@ -71,31 +71,49 @@
                 <span>Laporan Penjualan</span>
             </a>
         </nav>
-
-        <div class="sidebar-footer">
-            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
-                <div style="width: 32px; height: 32px; border-radius: var(--radius-full); background: #dcfce7; color: #00873d; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; flex-shrink: 0;">
-                    {{ strtoupper(substr(Auth::guard('admin')->user()->name, 0, 1)) }}
-                </div>
-                <div style="flex: 1; min-width: 0;">
-                    <div style="font-weight: 700; font-size: 0.8rem; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                        {{ Auth::guard('admin')->user()->name }}
-                    </div>
-                    <div style="font-size: 0.7rem; color: #64748b;">Administrator</div>
-                </div>
-            </div>
-            <form method="POST" action="{{ route('admin.logout') }}">
-                @csrf
-                <button type="submit" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 7px 10px; border-radius: var(--radius-md); background: #f1f5f9; border: 1px solid #e2e8f0; color: #64748b; font-size: 0.775rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: all var(--transition);">
-                    <x-icon name="logout" size="14" />
-                    <span>Keluar</span>
-                </button>
-            </form>
-        </div>
     </aside>
 
     <!-- MAIN CONTENT -->
     <main class="admin-content">
+
+        <!-- ADMIN TOP HEADER BAR (AVATAR, NAME, & LOGOUT ACTION) -->
+        <header class="admin-top-nav">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div style="font-weight: 800; font-size: 1.1rem; color: #0f172a;">
+                    @yield('title', 'Admin Panel')
+                </div>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 14px;">
+                <!-- Real-Time Time Pill -->
+                <div class="admin-time-badge">
+                    <x-icon name="clock" size="13" />
+                    <span>{{ now()->format('d M Y, H:i') }} WIB</span>
+                </div>
+
+                <!-- Admin User Profile & Logout -->
+                <div style="display: flex; align-items: center; gap: 10px; padding-left: 12px; border-left: 1px solid #e2e8f0;">
+                    <div style="width: 34px; height: 34px; border-radius: var(--radius-full); background: #dcfce7; color: #00873d; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; flex-shrink: 0; box-shadow: 0 2px 6px rgba(0,135,61,0.15);">
+                        {{ strtoupper(substr(Auth::guard('admin')->user()->name, 0, 1)) }}
+                    </div>
+                    <div class="admin-user-info">
+                        <div style="font-weight: 700; font-size: 0.825rem; color: #0f172a; line-height: 1.2;">
+                            {{ Auth::guard('admin')->user()->name }}
+                        </div>
+                        <div style="font-size: 0.7rem; color: #64748b;">Administrator</div>
+                    </div>
+
+                    <!-- Logout Button in Header -->
+                    <form method="POST" action="{{ route('admin.logout') }}" style="margin-left: 4px;">
+                        @csrf
+                        <button type="submit" class="admin-logout-btn" title="Keluar dari Panel Admin">
+                            <x-icon name="logout" size="14" />
+                            <span>Keluar</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </header>
 
         @if(session('success') || session('error') || session('warning'))
         <div style="margin-bottom: var(--space-md);">
