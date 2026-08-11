@@ -1914,6 +1914,64 @@ textarea.form-control { resize: vertical; min-height: 105px; }
     border: 1.5px solid #fff;
 }
 
+/* Admin Profile Dropdown */
+.admin-profile-dropdown-wrapper {
+    position: relative;
+}
+
+.admin-dropdown-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    min-width: 220px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    padding: 6px;
+    z-index: 100;
+    display: none;
+    animation: fadeIn 0.15s ease-out;
+}
+
+.admin-dropdown-menu.show {
+    display: block;
+}
+
+.admin-dropdown-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px 10px;
+}
+
+.admin-dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #334155;
+    text-decoration: none;
+    transition: all var(--transition);
+}
+
+.admin-dropdown-item:hover {
+    background: #f1f5f9;
+    color: #0f172a;
+}
+
+.admin-dropdown-item.danger {
+    color: #ef4444;
+}
+
+.admin-dropdown-item.danger:hover {
+    background: #fef2f2;
+    color: #dc2626;
+}
+
 /* 2-Column Overview Row */
 .saas-overview-grid {
     display: grid;

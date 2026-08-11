@@ -20,7 +20,7 @@
     </div>
     <button id="admin-sidebar-toggle" style="background: none; border: 1.5px solid rgba(255,255,255,.2); color: #fff; padding: 6px 10px; border-radius: var(--radius-md); cursor: pointer;">
         <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="4" x2="20" y1="12" x2="20"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/>
+            <line x1="4" x2="20" y1="12" x2="20"/><line x1="4" x2="20" y1="6" x2="6"/><line x1="4" x2="20" y1="18" x2="18"/>
         </svg>
     </button>
 </div>
@@ -85,20 +85,50 @@
                 </svg>
             </button>
 
-            <!-- Right: Action Circles (Dark Avatar, Gray Logout) -->
+            <!-- Right: Admin Profile Avatar Trigger with Dropdown -->
             <div class="header-actions-group">
-                <!-- User Avatar Initial -->
-                <div class="header-circle-btn dark" title="{{ Auth::guard('admin')->user()->name }} (Administrator)">
-                    {{ strtoupper(substr(Auth::guard('admin')->user()->name, 0, 1)) }}
-                </div>
-
-                <!-- Tombol Keluar (Logout) -->
-                <form method="POST" action="{{ route('admin.logout') }}" style="display: inline-flex; margin: 0;">
-                    @csrf
-                    <button type="submit" class="header-circle-btn gray" title="Keluar dari Akun">
-                        <x-icon name="logout" size="13" />
+                <div class="admin-profile-dropdown-wrapper" id="admin-profile-wrapper">
+                    <button type="button" class="header-circle-btn dark" id="admin-profile-toggle" title="Menu Administrator" aria-expanded="false" style="cursor: pointer;">
+                        {{ strtoupper(substr(Auth::guard('admin')->user()->name, 0, 1)) }}
                     </button>
-                </form>
+
+                    <!-- Dropdown Menu -->
+                    <div class="admin-dropdown-menu" id="admin-dropdown-menu">
+                        <div class="admin-dropdown-header">
+                            <div class="header-circle-btn dark" style="width: 34px; height: 34px; font-size: 0.85rem; flex-shrink: 0;">
+                                {{ strtoupper(substr(Auth::guard('admin')->user()->name, 0, 1)) }}
+                            </div>
+                            <div style="overflow: hidden; line-height: 1.2;">
+                                <div style="font-weight: 700; font-size: 0.825rem; color: #0f172a; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">
+                                    {{ Auth::guard('admin')->user()->name }}
+                                </div>
+                                <div style="font-size: 0.7rem; color: #64748b; margin-top: 2px;">Administrator</div>
+                            </div>
+                        </div>
+
+                        <div class="dropdown-divider"></div>
+
+                        <a href="{{ route('admin.dashboard') }}" class="admin-dropdown-item">
+                            <x-icon name="dashboard" size="14" />
+                            <span>Dashboard</span>
+                        </a>
+
+                        <a href="{{ route('home') }}" target="_blank" class="admin-dropdown-item">
+                            <x-icon name="eye" size="14" />
+                            <span>Lihat Toko Publik</span>
+                        </a>
+
+                        <div class="dropdown-divider"></div>
+
+                        <form method="POST" action="{{ route('admin.logout') }}" style="margin: 0;">
+                            @csrf
+                            <button type="submit" class="admin-dropdown-item danger" style="width: 100%; border: none; background: none; text-align: left; cursor: pointer; font-family: inherit;">
+                                <x-icon name="logout" size="14" />
+                                <span>Keluar (Logout)</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
             </div>
         </header>
 
@@ -138,6 +168,7 @@
 </div>
 
 <script>
+// Sidebar Toggle Logic
 const sidebarToggle = document.getElementById('admin-sidebar-toggle');
 const desktopSidebarToggle = document.getElementById('desktop-sidebar-toggle');
 const adminSidebar = document.getElementById('admin-sidebar');
@@ -151,6 +182,34 @@ function toggleSidebar() {
 sidebarToggle?.addEventListener('click', toggleSidebar);
 desktopSidebarToggle?.addEventListener('click', toggleSidebar);
 sidebarBackdrop?.addEventListener('click', toggleSidebar);
+
+// Admin Profile Dropdown Logic
+const profileToggle = document.getElementById('admin-profile-toggle');
+const profileMenu = document.getElementById('admin-dropdown-menu');
+const profileWrapper = document.getElementById('admin-profile-wrapper');
+
+profileToggle?.addEventListener('click', function(e) {
+    e.stopPropagation();
+    profileMenu?.classList.toggle('show');
+    const isExpanded = profileMenu?.classList.contains('show');
+    profileToggle.setAttribute('aria-expanded', isExpanded ? 'true' : 'false');
+});
+
+// Close when clicking outside
+document.addEventListener('click', function(e) {
+    if (profileWrapper && !profileWrapper.contains(e.target)) {
+        profileMenu?.classList.remove('show');
+        profileToggle?.setAttribute('aria-expanded', 'false');
+    }
+});
+
+// Close with Escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && profileMenu?.classList.contains('show')) {
+        profileMenu.classList.remove('show');
+        profileToggle?.setAttribute('aria-expanded', 'false');
+    }
+});
 </script>
 
 @stack('scripts')
