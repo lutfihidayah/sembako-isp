@@ -3,27 +3,35 @@
 @section('title', 'Detail Pesanan ' . $order->order_number)
 
 @section('content')
-<div class="section">
-<div class="container">
-    <div style="margin-bottom: var(--space-md);">
-        <a href="{{ route('orders.index') }}" style="color: var(--gray-500); font-size: 0.875rem;">← Kembali ke Pesanan Saya</a>
-    </div>
-
-    <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: var(--space-xl); flex-wrap: wrap; gap: var(--space-md);">
-        <div>
-            <h1 style="font-size: 1.5rem; font-family: monospace; color: var(--primary-700);">{{ $order->order_number }}</h1>
-            <p class="text-muted">Dipesan pada {{ $order->created_at->format('d M Y, H:i') }} WIB</p>
+<div class="section" style="padding-bottom: 90px;">
+<div class="container" style="max-width: 960px;">
+    <!-- Breadcrumb & Header -->
+    <div style="margin-bottom: 18px;">
+        <div style="display: flex; align-items: center; gap: 6px; font-size: 0.8rem; color: #64748b; margin-bottom: 6px;">
+            <a href="{{ route('orders.index') }}" style="color: #64748b; text-decoration: none;">← Kembali ke Pesanan Saya</a>
         </div>
-        <span class="badge status-{{ $order->status }}" style="font-size: 0.95rem; padding: 8px 18px;">{{ $order->status_label }}</span>
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+            <div>
+                <h1 style="font-size: 1.35rem; font-weight: 800; color: #0f172a; margin: 0; font-family: monospace; letter-spacing: 0.5px;">
+                    {{ $order->order_number }}
+                </h1>
+                <div style="font-size: 0.8rem; color: #64748b; margin-top: 2px;">
+                    Dipesan pada {{ $order->created_at->format('d M Y, H:i') }} WIB
+                </div>
+            </div>
+            <span class="badge status-{{ $order->status }}" style="font-size: 0.85rem; padding: 6px 16px; border-radius: 20px; font-weight: 700;">
+                {{ $order->status_label }}
+            </span>
+        </div>
     </div>
 
-    <!-- STATUS TIMELINE -->
-    <div class="card mb-xl">
-        <div class="card-header" style="display: flex; align-items: center; gap: 8px;">
+    <!-- 1. STATUS TIMELINE -->
+    <div class="card mb-lg" style="border-radius: 14px; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.04); overflow: hidden;">
+        <div style="background: #f8fafc; padding: 12px 16px; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; gap: 8px; font-weight: 700; color: #1e293b; font-size: 0.9rem;">
             <x-icon name="map-pin" size="16" />
-            <span>Tahapan Status Pesanan</span>
+            <span>Lacak Status Pesanan</span>
         </div>
-        <div class="card-body">
+        <div class="card-body" style="padding: 16px;">
             @php
                 $statusFlow = \App\Models\Order::STATUS_FLOW;
                 $statusLabels = \App\Models\Order::STATUS_LABELS;
@@ -33,208 +41,201 @@
             @endphp
 
             @if(!$isCancelled)
-            <div class="timeline-steps">
-                @foreach($statusFlow as $i => $statusKey)
-                <div class="timeline-step {{ $i < $currentIndex ? 'completed' : ($i == $currentIndex ? 'active' : '') }}">
-                    <div class="step-icon">
-                        @if($i < $currentIndex)
-                            <x-icon name="check" size="16" />
-                        @elseif($i == $currentIndex)
-                            <x-icon name="{{ $statusIcons[$i] ?? 'check-circle' }}" size="18" />
-                        @else
-                            {{ $i + 1 }}
-                        @endif
+            <div class="timeline-scroll-container">
+                <div class="timeline-steps" style="min-width: 520px; padding: 10px 0;">
+                    @foreach($statusFlow as $i => $statusKey)
+                    <div class="timeline-step {{ $i < $currentIndex ? 'completed' : ($i == $currentIndex ? 'active' : '') }}">
+                        <div class="step-icon">
+                            @if($i < $currentIndex)
+                                <x-icon name="check" size="16" />
+                            @elseif($i == $currentIndex)
+                                <x-icon name="{{ $statusIcons[$i] ?? 'check-circle' }}" size="16" />
+                            @else
+                                {{ $i + 1 }}
+                            @endif
+                        </div>
+                        <div class="step-label" style="font-size: 0.725rem;">{{ $statusLabels[$statusKey] }}</div>
                     </div>
-                    <div class="step-label">{{ $statusLabels[$statusKey] }}</div>
+                    @endforeach
                 </div>
-                @endforeach
             </div>
             @else
-            <div class="alert alert-error">
+            <div class="alert alert-error" style="border-radius: 10px; margin: 0;">
                 <span class="alert-icon"><x-icon name="x-circle" size="18" /></span>
                 <span>Pesanan ini telah dibatalkan.</span>
-            </div>
-            @endif
-
-            <!-- Status Logs -->
-            @if($order->statusLogs->isNotEmpty())
-            <div style="margin-top: var(--space-xl); border-top: 1px solid var(--gray-100); padding-top: var(--space-lg);">
-                <h4 style="margin-bottom: var(--space-md); color: var(--gray-700); font-size: 0.95rem;">Riwayat Perubahan Status</h4>
-                @foreach($order->statusLogs as $log)
-                <div style="display: flex; gap: var(--space-md); margin-bottom: 8px;">
-                    <div style="font-size: 0.8rem; color: var(--gray-400); min-width: 140px;">
-                        {{ $log->created_at->format('d M Y H:i') }} WIB
-                    </div>
-                    <div>
-                        <span class="badge status-{{ $log->status }}" style="font-size: 0.75rem;">{{ $statusLabels[$log->status] ?? $log->status }}</span>
-                        @if($log->note)
-                        <div style="font-size: 0.825rem; color: var(--gray-600); margin-top: 2px;">{{ $log->note }}</div>
-                        @endif
-                    </div>
-                </div>
-                @endforeach
             </div>
             @endif
         </div>
     </div>
 
-    <div class="layout-split-sidebar">
+    <!-- 2. Main Order Content -->
+    <div style="display: grid; grid-template-columns: 1fr 340px; gap: 20px; align-items: start;" class="checkout-grid">
 
-        <!-- Left: Items & Payment -->
-        <div style="display: flex; flex-direction: column; gap: var(--space-lg);">
+        <!-- Left Column: Items & Payment Proof -->
+        <div style="display: flex; flex-direction: column; gap: 16px;">
 
-            <!-- Items -->
-            <div class="card">
-                <div class="card-header" style="display: flex; align-items: center; gap: 8px;">
-                    <x-icon name="package" size="16" />
-                    <span>Daftar Item Pesanan</span>
+            <!-- Items Card -->
+            <div class="card" style="border-radius: 14px; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.04); overflow: hidden;">
+                <div style="background: #f8fafc; padding: 12px 16px; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between; font-weight: 700; color: #1e293b; font-size: 0.9rem;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <x-icon name="package" size="16" />
+                        <span>Rincian Produk Sembako</span>
+                    </div>
+                    <span style="font-size: 0.775rem; color: #64748b;">{{ $order->items->count() }} Paket</span>
                 </div>
+
                 <div class="card-body" style="padding: 0;">
                     @foreach($order->items as $item)
-                    <div style="display: flex; align-items: center; gap: var(--space-md); padding: var(--space-md) var(--space-lg); border-bottom: 1px solid var(--gray-50);">
-                        <div style="width: 56px; height: 56px; border-radius: var(--radius-md); overflow: hidden; background: var(--primary-50); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    <div style="display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-bottom: 1px solid #f1f5f9;">
+                        <div style="width: 58px; height: 58px; border-radius: 8px; overflow: hidden; background: #f8fafc; border: 1px solid #e2e8f0; flex-shrink: 0; display: flex; align-items: center; justify-content: center;">
                             @if($item->package && $item->package->primary_image)
                             <img src="{{ asset('storage/' . $item->package->primary_image) }}" alt="{{ $item->package->name }}" style="width: 100%; height: 100%; object-fit: cover;">
                             @else
-                            <x-icon name="package" size="24" />
+                            <x-icon name="package" size="24" style="color: #94a3b8;" />
                             @endif
                         </div>
-                        <div style="flex: 1;">
-                            <div style="font-weight: 600; color: var(--gray-800);">{{ $item->package ? $item->package->name : 'Paket dihapus' }}</div>
-                            <div style="font-size: 0.8rem; color: var(--gray-500);">Rp {{ number_format($item->price, 0, ',', '.') }} × {{ $item->quantity }}</div>
+                        <div style="flex: 1; min-width: 0;">
+                            <div style="font-weight: 700; color: #0f172a; font-size: 0.9rem; line-height: 1.3;">{{ $item->package ? $item->package->name : 'Paket Sembako' }}</div>
+                            <div style="font-size: 0.775rem; color: #64748b; margin-top: 2px;">
+                                Rp {{ number_format($item->price, 0, ',', '.') }} × {{ $item->quantity }}
+                            </div>
                         </div>
-                        <div style="font-weight: 700; color: var(--gray-800);">Rp {{ number_format($item->subtotal, 0, ',', '.') }}</div>
+                        <div style="font-weight: 700; color: #0f172a; font-size: 0.9rem; text-align: right;">
+                            Rp {{ number_format($item->subtotal, 0, ',', '.') }}
+                        </div>
                     </div>
                     @endforeach
-                    <div style="padding: var(--space-md) var(--space-lg); display: flex; justify-content: space-between; align-items: center;">
-                        <span style="font-weight: 700; font-size: 1rem;">Total Pembayaran</span>
-                        <span style="font-weight: 800; font-size: 1.2rem; color: var(--primary-600);">Rp {{ number_format($order->total_price, 0, ',', '.') }}</span>
+
+                    <div style="padding: 14px 16px; background: #fafafa; display: flex; justify-content: space-between; align-items: baseline;">
+                        <span style="font-weight: 700; color: #334155; font-size: 0.925rem;">Total Tagihan</span>
+                        <span style="font-weight: 800; font-size: 1.25rem; color: #00873d;">Rp {{ number_format($order->total_price, 0, ',', '.') }}</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Payment Proof Upload -->
+            <!-- Upload Payment Proof Card (Only for Menunggu Pembayaran) -->
             @if($order->status === 'menunggu_pembayaran')
-            <div class="card">
-                <div class="card-header" style="display: flex; align-items: center; gap: 8px;">
+            <div class="card" style="border-radius: 14px; border: 1.5px solid #fed7aa; box-shadow: 0 2px 8px rgba(249,115,22,0.08); overflow: hidden;">
+                <div style="background: #fff7ed; padding: 12px 16px; border-bottom: 1px solid #ffedd5; display: flex; align-items: center; gap: 8px; font-weight: 700; color: #c2410c; font-size: 0.9rem;">
                     <x-icon name="upload" size="16" />
-                    <span>Upload Bukti Pembayaran</span>
+                    <span>Petunjuk & Upload Bukti Pembayaran</span>
                 </div>
-                <div class="card-body">
-                    @if($order->expired_at && now()->gt($order->expired_at))
-                    <div class="alert alert-error">
-                        <span class="alert-icon"><x-icon name="alert-triangle" size="18" /></span>
-                        <span>Pesanan ini telah kedaluwarsa. Batas waktu pembayaran telah lewat.</span>
-                    </div>
-                    @else
-                    @if($order->expired_at)
-                    <div class="alert alert-warning mb-md">
-                        <span class="alert-icon"><x-icon name="clock" size="18" /></span>
-                        <span>Batas waktu pembayaran: <strong>{{ $order->expired_at->format('d M Y, H:i') }} WIB</strong> ({{ $order->expired_at->diffForHumans() }})</span>
-                    </div>
-                    @endif
 
-                    @if($order->payment_method === 'transfer_bank')
-                    <div class="alert alert-info mb-md">
-                        <span class="alert-icon"><x-icon name="bank" size="18" /></span>
-                        <div>
-                            <div>Transfer ke rekening resmi ISP:</div>
-                            <strong>Bank BCA: 1234-5678-90 a/n Sembako ISP</strong><br>
-                            Jumlah Tagihan: <strong>Rp {{ number_format($order->total_price, 0, ',', '.') }}</strong>
+                <div class="card-body" style="padding: 16px;">
+                    <!-- Bank Details Card -->
+                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px; margin-bottom: 16px;">
+                        <div style="font-size: 0.8rem; color: #64748b; margin-bottom: 4px;">Silakan transfer ke rekening resmi ISP:</div>
+                        <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;">
+                            <div>
+                                <div style="font-weight: 800; font-size: 1.05rem; color: #0f172a; font-family: monospace;">1234-5678-90</div>
+                                <div style="font-size: 0.775rem; color: #475569; font-weight: 600;">Bank BCA a/n Sembako ISP Official</div>
+                            </div>
+                            <button type="button" onclick="copyRekening('1234567890')" style="padding: 6px 12px; font-size: 0.75rem; font-weight: 700; color: #00873d; background: #dcfce7; border: 1px solid #86efac; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;" id="btnCopyRek">
+                                <x-icon name="copy" size="13" />
+                                <span id="copyText">Salin No. Rek</span>
+                            </button>
                         </div>
                     </div>
-                    @else
-                    <div class="alert alert-info mb-md">
-                        <span class="alert-icon"><x-icon name="qr-code" size="18" /></span>
-                        <div>
-                            Scan kode QRIS dan lakukan transfer senilai: <strong>Rp {{ number_format($order->total_price, 0, ',', '.') }}</strong>
-                        </div>
-                    </div>
-                    @endif
 
                     @if($order->payment_proof)
-                    <div style="margin-bottom: var(--space-md);">
-                        <p class="text-sm text-muted">Bukti yang telah diunggah:</p>
-                        <a href="{{ asset('storage/' . $order->payment_proof) }}" target="_blank" class="btn btn-ghost btn-sm" style="display: inline-flex; align-items: center; gap: 6px;">
-                            <x-icon name="paperclip" size="14" />
-                            <span>Lihat Bukti Pembayaran</span>
+                    <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 10px; padding: 12px 14px; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <x-icon name="check-circle" size="16" style="color: #00873d;" />
+                            <span style="font-size: 0.8rem; color: #166534; font-weight: 600;">Bukti transfer telah diunggah</span>
+                        </div>
+                        <a href="{{ asset('storage/' . $order->payment_proof) }}" target="_blank" style="font-size: 0.775rem; font-weight: 700; color: #00873d; text-decoration: underline;">
+                            Lihat Foto
                         </a>
                     </div>
                     @endif
 
                     <form method="POST" action="{{ route('orders.upload-payment', $order) }}" enctype="multipart/form-data">
                         @csrf
-                        <div class="form-group">
-                            <label class="form-label">Pilih Berkas Bukti Transfer <span class="required">*</span></label>
-                            <input type="file" name="payment_proof" class="form-control" accept=".jpg,.jpeg,.png,.pdf" required>
-                            <div class="form-hint">Format yang didukung: JPG, PNG, atau PDF. Ukuran maks 2 MB.</div>
+                        <div style="margin-bottom: 12px;">
+                            <label style="display: block; font-size: 0.825rem; font-weight: 700; color: #1e293b; margin-bottom: 6px;">
+                                {{ $order->payment_proof ? 'Ganti / Unggah Ulang Bukti Transfer' : 'Pilih Foto Bukti Transfer' }}
+                            </label>
+                            <input type="file" name="payment_proof" class="form-control" accept=".jpg,.jpeg,.png,.pdf" required style="font-size: 0.825rem; padding: 8px;">
+                            <div style="font-size: 0.725rem; color: #94a3b8; margin-top: 4px;">Format: JPG, PNG, atau PDF (Maks. 2 MB)</div>
                             @error('payment_proof')
-                            <div class="form-error">{{ $message }}</div>
+                            <div class="form-error" style="color: #ef4444; font-size: 0.775rem; margin-top: 4px;">{{ $message }}</div>
                             @enderror
                         </div>
-                        <button type="submit" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 8px;">
-                            <x-icon name="upload" size="16" />
-                            <span>Unggah Bukti</span>
+
+                        <button type="submit" class="btn btn-primary" style="width: 100%; padding: 10px; font-weight: 700; border-radius: 8px; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                            <x-icon name="upload" size="15" />
+                            <span>{{ $order->payment_proof ? 'Kirim Ulang Bukti' : 'Kirim Bukti Pembayaran' }}</span>
                         </button>
                     </form>
-                    @endif
                 </div>
             </div>
             @endif
 
         </div>
 
-        <!-- Right: Info -->
-        <div style="display: flex; flex-direction: column; gap: var(--space-md);">
+        <!-- Right Column: Drop Point & Info -->
+        <div style="display: flex; flex-direction: column; gap: 16px;">
 
-            <!-- Drop Point Info -->
-            <div class="card">
-                <div class="card-header" style="display: flex; align-items: center; gap: 8px;">
+            <!-- Drop Point Info Card -->
+            <div class="card" style="border-radius: 14px; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.04); overflow: hidden;">
+                <div style="background: #f8fafc; padding: 12px 16px; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; gap: 8px; font-weight: 700; color: #1e293b; font-size: 0.9rem;">
                     <x-icon name="map-pin" size="16" />
                     <span>Drop Point Pengambilan</span>
                 </div>
-                <div class="card-body">
-                    <div style="font-weight: 700; font-size: 1rem; margin-bottom: 6px;">{{ $order->dropPoint->name }}</div>
-                    <div style="font-size: 0.875rem; color: var(--gray-600); margin-bottom: 6px;">{{ $order->dropPoint->address }}</div>
-                    <div style="font-size: 0.825rem; color: var(--gray-500); margin-bottom: 4px;">Jam: {{ $order->dropPoint->operational_hours }}</div>
-                    <div style="font-size: 0.825rem; color: var(--gray-500);">Kontak: {{ $order->dropPoint->contact_number }}</div>
+                <div class="card-body" style="padding: 16px;">
+                    <div style="font-weight: 800; font-size: 0.95rem; color: #0f172a; margin-bottom: 4px;">{{ $order->dropPoint->name }}</div>
+                    <div style="font-size: 0.825rem; color: #475569; margin-bottom: 8px; line-height: 1.4;">
+                        {{ $order->dropPoint->address }}
+                    </div>
+                    <div style="font-size: 0.775rem; color: #64748b; margin-bottom: 4px;">
+                        ⏰ Jam Buka: <strong>{{ $order->dropPoint->operational_hours }}</strong>
+                    </div>
+                    <div style="font-size: 0.775rem; color: #64748b;">
+                        📞 Kontak: <strong>{{ $order->dropPoint->contact_number }}</strong>
+                    </div>
                 </div>
             </div>
 
-            <!-- Payment Info -->
-            <div class="card">
-                <div class="card-header" style="display: flex; align-items: center; gap: 8px;">
+            <!-- Payment Summary Card -->
+            <div class="card" style="border-radius: 14px; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.04); overflow: hidden;">
+                <div style="background: #f8fafc; padding: 12px 16px; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; gap: 8px; font-weight: 700; color: #1e293b; font-size: 0.9rem;">
                     <x-icon name="credit-card" size="16" />
-                    <span>Informasi Pembayaran</span>
+                    <span>Info Metode Pembayaran</span>
                 </div>
-                <div class="card-body">
-                    <div style="display: flex; flex-direction: column; gap: 8px; font-size: 0.875rem;">
-                        <div style="display: flex; justify-content: space-between;">
-                            <span class="text-muted">Metode</span>
-                            <span style="font-weight: 600;">{{ $order->payment_method_label }}</span>
-                        </div>
-                        <div style="display: flex; justify-content: space-between;">
-                            <span class="text-muted">Status Bayar</span>
-                            @if($order->status === 'menunggu_pembayaran')
-                            <span class="badge badge-warning">Menunggu Pembayaran</span>
-                            @elseif($order->status === 'dibatalkan')
-                            <span class="badge badge-danger">Dibatalkan</span>
-                            @else
-                            <span class="badge badge-success">Terverifikasi</span>
-                            @endif
-                        </div>
-                        @if($order->payment_proof && $order->status !== 'menunggu_pembayaran')
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <span class="text-muted">Bukti Bayar</span>
-                            <a href="{{ asset('storage/' . $order->payment_proof) }}" target="_blank" style="color: var(--primary-600); font-size: 0.8rem; font-weight: 500;">Lihat Berkas →</a>
-                        </div>
+                <div class="card-body" style="padding: 16px; display: flex; flex-direction: column; gap: 10px; font-size: 0.85rem;">
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: #64748b;">Metode</span>
+                        <span style="font-weight: 700; color: #0f172a;">{{ $order->payment_method_label }}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="color: #64748b;">Status Bayar</span>
+                        @if($order->status === 'menunggu_pembayaran')
+                        <span style="font-size: 0.75rem; font-weight: 700; color: #c2410c; background: #ffedd5; padding: 2px 8px; border-radius: 6px;">Menunggu Bukti</span>
+                        @elseif($order->status === 'dibatalkan')
+                        <span style="font-size: 0.75rem; font-weight: 700; color: #b91c1c; background: #fee2e2; padding: 2px 8px; border-radius: 6px;">Dibatalkan</span>
+                        @else
+                        <span style="font-size: 0.75rem; font-weight: 700; color: #15803d; background: #dcfce7; padding: 2px 8px; border-radius: 6px;">Lunas / Terverifikasi</span>
                         @endif
                     </div>
                 </div>
             </div>
 
         </div>
+
     </div>
 </div>
 </div>
+
+@push('scripts')
+<script>
+function copyRekening(text) {
+    navigator.clipboard.writeText(text).then(function() {
+        const span = document.getElementById('copyText');
+        span.innerText = 'Tersalin! ✓';
+        setTimeout(() => span.innerText = 'Salin No. Rek', 2500);
+    });
+}
+</script>
+@endpush
+
 @endsection

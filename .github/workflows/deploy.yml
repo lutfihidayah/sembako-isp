@@ -1,0 +1,28 @@
+name: Deploy to VPS Production
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: 103.191.218.97
+          port: 7823
+          username: root
+          password: ${{ secrets.VPS_PASSWORD }}
+          script: |
+            cd /opt/projects/sembako
+            git pull origin main
+            composer install --no-dev --optimize-autoloader
+            php artisan migrate --force
+            php artisan config:cache
+            php artisan route:cache
+            php artisan view:cache
+            chown -R www-data:www-data /opt/projects/sembako
+            chmod -R 775 storage bootstrap/cache
+            systemctl restart php8.3-fpm
