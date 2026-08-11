@@ -1796,60 +1796,104 @@ textarea.form-control { resize: vertical; min-height: 105px; }
     padding: 18px 22px;
 }
 
+/* SaaS Lector Minimalist Admin Topbar */
 .admin-top-nav {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 10px 18px;
+    padding: 6px 14px;
     background: #ffffff;
     border: 1px solid #e2e8f0;
-    border-radius: var(--radius-lg);
-    box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    border-radius: 12px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.02);
     margin-bottom: 16px;
-    flex-wrap: wrap;
-    gap: 10px;
+    height: 44px;
 }
 
-.admin-time-badge {
-    font-size: 0.775rem;
+.header-toggle-btn {
+    background: none;
+    border: none;
     color: #64748b;
+    padding: 6px;
+    border-radius: 6px;
+    cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 6px;
-    background: #f8fafc;
-    padding: 5px 10px;
-    border-radius: var(--radius-full);
-    border: 1px solid #e2e8f0;
-    font-weight: 600;
-}
-
-.admin-logout-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    padding: 6px 12px;
-    border-radius: 8px;
-    background: #fef2f2;
-    border: 1px solid #fecaca;
-    color: #ef4444;
-    font-size: 0.775rem;
-    font-weight: 600;
-    cursor: pointer;
-    font-family: inherit;
+    justify-content: center;
     transition: all var(--transition);
 }
 
-.admin-logout-btn:hover {
-    background: #fee2e2;
-    color: #dc2626;
-    border-color: #fca5a5;
-    transform: translateY(-1px);
+.header-toggle-btn:hover {
+    background: #f1f5f9;
+    color: #0f172a;
 }
 
-@media (max-width: 640px) {
-    .admin-user-info, .admin-time-badge {
-        display: none;
-    }
+.header-actions-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.header-circle-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    position: relative;
+    transition: all var(--transition);
+}
+
+.header-circle-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+}
+
+.header-circle-btn.cyan {
+    background: #38bdf8;
+    color: #ffffff;
+    box-shadow: 0 2px 5px rgba(56, 189, 248, 0.35);
+}
+
+.header-circle-btn.pink {
+    background: #f43f5e;
+    color: #ffffff;
+    box-shadow: 0 2px 5px rgba(244, 63, 94, 0.35);
+}
+
+.header-circle-btn.dark {
+    background: #0f172a;
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 0.75rem;
+    box-shadow: 0 2px 5px rgba(15, 23, 42, 0.25);
+}
+
+.header-circle-btn.gray {
+    background: #f8fafc;
+    color: #64748b;
+    border: 1px solid #e2e8f0;
+}
+
+.header-circle-btn.gray:hover {
+    background: #fee2e2;
+    color: #ef4444;
+    border-color: #fca5a5;
+}
+
+.header-badge-dot {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #f59e0b;
+    border: 1.5px solid #fff;
 }
 
 /* 2-Column Overview Row */

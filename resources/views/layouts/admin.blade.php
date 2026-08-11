@@ -76,42 +76,42 @@
     <!-- MAIN CONTENT -->
     <main class="admin-content">
 
-        <!-- ADMIN TOP HEADER BAR (AVATAR, NAME, & LOGOUT ACTION) -->
+        <!-- SAAS MINIMALIST NAVBAR (LECTOR STYLE) -->
         <header class="admin-top-nav">
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <div style="font-weight: 800; font-size: 1.1rem; color: #0f172a;">
-                    @yield('title', 'Admin Panel')
-                </div>
-            </div>
+            <!-- Left: Toggle Menu Button -->
+            <button type="button" class="header-toggle-btn" id="desktop-sidebar-toggle" title="Toggle Sidebar">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/>
+                </svg>
+            </button>
 
-            <div style="display: flex; align-items: center; gap: 14px;">
-                <!-- Real-Time Time Pill -->
-                <div class="admin-time-badge">
-                    <x-icon name="clock" size="13" />
-                    <span>{{ now()->format('d M Y, H:i') }} WIB</span>
+            <!-- Right: Action Circles (Cyan, Pink, Dark Avatar, Gray Action) -->
+            <div class="header-actions-group">
+                <!-- 1. Cyan Circle: Lihat Toko Publik -->
+                <a href="{{ route('home') }}" target="_blank" class="header-circle-btn cyan" title="Buka Toko Publik (Frontend)">
+                    <x-icon name="eye" size="14" />
+                </a>
+
+                <!-- 2. Pink Circle: Notifikasi Pesanan Masuk -->
+                <a href="{{ route('admin.orders.index') }}" class="header-circle-btn pink" title="Kelola Pesanan">
+                    <x-icon name="receipt" size="13" />
+                    @if(!empty($pendingCount) && $pendingCount > 0)
+                    <span class="header-badge-dot"></span>
+                    @endif
+                </a>
+
+                <!-- 3. Dark Circle: User Avatar Initial -->
+                <div class="header-circle-btn dark" title="{{ Auth::guard('admin')->user()->name }} (Administrator)">
+                    {{ strtoupper(substr(Auth::guard('admin')->user()->name, 0, 1)) }}
                 </div>
 
-                <!-- Admin User Profile & Logout -->
-                <div style="display: flex; align-items: center; gap: 10px; padding-left: 12px; border-left: 1px solid #e2e8f0;">
-                    <div style="width: 34px; height: 34px; border-radius: var(--radius-full); background: #dcfce7; color: #00873d; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; flex-shrink: 0; box-shadow: 0 2px 6px rgba(0,135,61,0.15);">
-                        {{ strtoupper(substr(Auth::guard('admin')->user()->name, 0, 1)) }}
-                    </div>
-                    <div class="admin-user-info">
-                        <div style="font-weight: 700; font-size: 0.825rem; color: #0f172a; line-height: 1.2;">
-                            {{ Auth::guard('admin')->user()->name }}
-                        </div>
-                        <div style="font-size: 0.7rem; color: #64748b;">Administrator</div>
-                    </div>
-
-                    <!-- Logout Button in Header -->
-                    <form method="POST" action="{{ route('admin.logout') }}" style="margin-left: 4px;">
-                        @csrf
-                        <button type="submit" class="admin-logout-btn" title="Keluar dari Panel Admin">
-                            <x-icon name="logout" size="14" />
-                            <span>Keluar</span>
-                        </button>
-                    </form>
-                </div>
+                <!-- 4. Gray Circle: Tombol Keluar (Logout) -->
+                <form method="POST" action="{{ route('admin.logout') }}" style="display: inline-flex; margin: 0;">
+                    @csrf
+                    <button type="submit" class="header-circle-btn gray" title="Keluar dari Akun">
+                        <x-icon name="logout" size="13" />
+                    </button>
+                </form>
             </div>
         </header>
 
@@ -148,15 +148,17 @@
 
 <script>
 const sidebarToggle = document.getElementById('admin-sidebar-toggle');
+const desktopSidebarToggle = document.getElementById('desktop-sidebar-toggle');
 const adminSidebar = document.getElementById('admin-sidebar');
 const sidebarBackdrop = document.getElementById('sidebar-backdrop');
 
 function toggleSidebar() {
     adminSidebar.classList.toggle('open');
-    sidebarBackdrop.classList.toggle('open');
+    if (sidebarBackdrop) sidebarBackdrop.classList.toggle('open');
 }
 
 sidebarToggle?.addEventListener('click', toggleSidebar);
+desktopSidebarToggle?.addEventListener('click', toggleSidebar);
 sidebarBackdrop?.addEventListener('click', toggleSidebar);
 </script>
 
