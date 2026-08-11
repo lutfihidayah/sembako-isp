@@ -2741,33 +2741,38 @@ textarea.form-control { resize: vertical; min-height: 105px; }
    SHOPEE STYLE "PESANAN SAYA" ORDERS LIST
    ============================================================ */
 .shopee-orders-container {
-    max-width: 680px;
+    max-width: 960px;
     margin: 0 auto;
-    padding: 0 12px 24px;
+    padding: 20px 16px 40px;
+}
+
+@media (max-width: 768px) {
+    .shopee-orders-container {
+        padding: 10px 12px 30px;
+    }
 }
 
 .shopee-app-bar {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 14px 4px;
-    margin-bottom: 4px;
+    padding: 12px 4px 18px;
 }
 
 .shopee-app-bar-title {
-    font-size: 1.15rem;
+    font-size: 1.25rem;
     font-weight: 800;
     color: #0f172a;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
 }
 
 .shopee-tabs-wrapper {
     background: #ffffff;
     border-radius: 12px;
     border: 1px solid #e2e8f0;
-    margin-bottom: 14px;
+    margin-bottom: 16px;
     overflow: hidden;
     box-shadow: 0 1px 3px rgba(0,0,0,0.02);
 }
@@ -2778,6 +2783,7 @@ textarea.form-control { resize: vertical; min-height: 105px; }
     scrollbar-width: none;
     -webkit-overflow-scrolling: touch;
     white-space: nowrap;
+    padding: 0 4px;
 }
 
 .shopee-tabs::-webkit-scrollbar {
@@ -2785,17 +2791,24 @@ textarea.form-control { resize: vertical; min-height: 105px; }
 }
 
 .shopee-tab {
-    padding: 12px 14px;
-    font-size: 0.825rem;
+    padding: 14px 18px;
+    font-size: 0.875rem;
     font-weight: 500;
     color: #64748b;
     text-decoration: none;
     border-bottom: 2.5px solid transparent;
     display: inline-flex;
     align-items: center;
-    gap: 4px;
+    gap: 6px;
     transition: all 0.2s ease;
     flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+    .shopee-tab {
+        padding: 12px 14px;
+        font-size: 0.825rem;
+    }
 }
 
 .shopee-tab:hover {
@@ -2824,13 +2837,14 @@ textarea.form-control { resize: vertical; min-height: 105px; }
     border-radius: 14px;
     border: 1px solid #e2e8f0;
     box-shadow: 0 1px 4px rgba(0,0,0,0.02);
-    margin-bottom: 12px;
+    margin-bottom: 14px;
     overflow: hidden;
     transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 .shopee-order-card:hover {
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+    border-color: #cbd5e1;
 }
 
 .shopee-card-header {

@@ -17,6 +17,15 @@ class OrderController extends Controller
 
         $query = $user->orders()->with(['dropPoint', 'items.package'])->orderBy('created_at', 'desc');
 
+        if ($search = $request->get('search')) {
+            $query->where(function($q) use ($search) {
+                $q->where('order_number', 'like', "%{$search}%")
+                  ->orWhereHas('items.package', function($pq) use ($search) {
+                      $pq->where('name', 'like', "%{$search}%");
+                  });
+            });
+        }
+
         if ($statusTab === 'belum_bayar') {
             $query->where('status', 'menunggu_pembayaran');
         } elseif ($statusTab === 'dikemas') {
